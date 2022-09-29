@@ -3,6 +3,7 @@ import express from "express";
 import { isCI, isDevelopment, isTest } from "./utils/environment";
 import routes from "./routes";
 
+
 const bypassCors = isCI() || isDevelopment() || isTest();
 const allowList = new Set(["http://localhost:3000"]);
 

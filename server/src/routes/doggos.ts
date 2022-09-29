@@ -5,11 +5,13 @@ import randomDogeImage from "../utils/randomDogeImage";
 const router = Router();
 
 router.get("/", async (_req: Request, res: Response) => {
+  console.log('Get Doggos');
   const doggos = await Doggo.find();
   res.send({ doggos });
 });
 
 router.post("/", async (req: Request, res: Response) => {
+  console.log('Create Doggos');
   const { name, age } = req.body;
   const doggo = await Doggo.create({
     name,
@@ -22,6 +24,7 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 router.delete("/", async (req: Request, res: Response) => {
+  console.log('Delete Doggos');
   const { id } = req.query;
   if (!id) return res.status(400).send({ message: "Please provide an id." });
 
