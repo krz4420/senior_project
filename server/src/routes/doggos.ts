@@ -5,7 +5,7 @@ import randomDogeImage from "../utils/randomDogeImage";
 const router = Router();
 
 router.get("/", async (_req: Request, res: Response) => {
-  const doggos = await Doggo.find();
+  const doggos = await  Doggo.find();
   res.send({ doggos });
 });
 
