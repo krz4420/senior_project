@@ -15,11 +15,11 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
       - name: Install Dependencies
-        run: yarn install:client
+        run: yarn install:mobile
       - name: Run Tests
-        run: yarn test:client
+        run: yarn test:mobile
       - name: Build
-        run: yarn build:client
+        run: yarn build:mobile
 
   test-and-build-server:
     name: Test & Build Server
