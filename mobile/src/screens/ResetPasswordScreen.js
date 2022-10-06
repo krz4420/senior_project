@@ -15,9 +15,9 @@ const ResetPasswordScreen = () => {
         navigation.navigate('Sign In')
     }
 
-    const onSignIn = () => {
+    const onLogIn = () => {
         console.warn("Back to sign in")
-        navigation.navigate('Sign In')
+        navigation.navigate('Log In')
     }
 
     const onNewCode = () => {
@@ -33,9 +33,9 @@ const ResetPasswordScreen = () => {
                 <CustomInput placeholder = "Code"  value={ code } setValue= { setCode }/>
                 <CustomInput placeholder = "Enter New Password"  value={ password } setValue= { setPassword }/>
                 
-                <CustomButton text= "Reset Password" onPress= {onResetPasswordPressed} ></CustomButton>
+                <CustomButton text= "Reset Password" onPress= { onResetPasswordPressed } ></CustomButton>
 
-                <CustomButton text= "Back to Sign In" onPress= {onSignIn} type="TERTIARY" ></CustomButton>
+                <CustomButton text= "Back to Sign In" onPress= { onLogIn } type="TERTIARY" ></CustomButton>
             </View>
         </ScrollView>
     )

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { TextInput } from 'react-native-paper';
 
-const CustomInput = ( { value, setValue, placeholder, secureTextEntry }) => {
+const CustomInput = ( { value, setValue, placeholder, secureTextEntry, autoCapitalize, onEndEditing, onPressOut }) => {
     const [ isFocused, setIsFocused ] = useState(false);
 
     const handleFocus = () => {
@@ -22,6 +22,9 @@ const CustomInput = ( { value, setValue, placeholder, secureTextEntry }) => {
                 styles= {[styles.input, `styles.label_${isFocused}`]}
                 secureTextEntry = { secureTextEntry } 
                 mode = 'outlined'
+                autoCapitalize= { autoCapitalize }
+                onEndEditing = {onEndEditing}
+                onPressOut = {onPressOut}
             />
         </View>
     )

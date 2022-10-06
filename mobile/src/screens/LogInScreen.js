@@ -6,25 +6,43 @@ import CustomButton from '../components/CustomButton'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 
-const SignInScreen = () => {
-    const [ username, setUsername ] = useState('')
-    const [ password, setPassword ] = useState("")
-
+const LogInScreen = () => {
     const navigation = useNavigation()
 
-    const onSignInPressed = () => {
-        console.warn("Sign In")
-        // Validate TODO
-        axios.post('http://10.0.0.139:4000/LogIn').then(res => {
-            
-        })
+    const [ username, setUsername ] = useState('');
+    const [ password, setPassword ] = useState('');
+    
+    const [ validForm, setValidForm ] = useState(true);
 
-        navigation.navigate('Home')
+    const onLogInPressed = () => {
+        console.warn("Log In")
+        // Validate TODO
+        const userInfo = {username, password};
+
+
+        axios.post('http://10.0.0.139:4000/LogIn', userInfo).then(res => {
+            console.log(res.data);
+
+            navigation.navigate('Home')
+        }).catch(err =>{
+            error = err.response.data.message
+            console.warn(error);
+
+            setValidForm(false);
+        });
+
+        // clearState();
+    }
+
+    const clearState = () => {
+        setUsername('');
+        setPassword('');
     }
 
     const onForgotPasswordPressed = () => {
         console.warn("Forgor")
 
+        // clearState();
         navigation.navigate('Forgot Password')
     }
 
@@ -35,6 +53,7 @@ const SignInScreen = () => {
     const onSignUp = () => {
         console.warn("Sign Up")
 
+        // clearState();
         navigation.navigate('Sign Up')
     }
 
@@ -47,20 +66,23 @@ const SignInScreen = () => {
                     style ={[styles.logo, {height: height * 0.3}]} 
                     resizeMode="contain"/>
 
+                {validForm ? null: 
+                    <Text style={styles.error}>Invalid Login Credentials!</Text>}
+
                 <CustomInput 
                     placeholder = "Username"  
                     value={ username} 
-                    setValue= {setUsername}/>
-
+                    setValue= {setUsername}
+                    autoCapitalize= {false}/>
                 <CustomInput 
                     placeholder = "Password" 
                     value = {password} 
                     setValue = {setPassword} 
-                    secureTextEntry/>
-
+                    secureTextEntry
+                    autoCapitalize={false}/>
                 <CustomButton 
                     text= "Sign In" 
-                    onPress= {onSignInPressed} />
+                    onPress= {onLogInPressed} />
 
                 <CustomButton 
                     text= "Forgot Password?" 
@@ -92,7 +114,11 @@ const styles = StyleSheet.create({
         width:'30%',
         maxWidth: 500,
         maxHeight: 200,
+    },
+    error:{
+        color:'red',
+        borderColor:'red',
     }
 });
 
-export default SignInScreen
+export default LogInScreen;

@@ -15,9 +15,9 @@ const ConfirmEmailScreen = () => {
         console.warn("Confirm")
     }
 
-    const onSignIn = () => {
+    const onLogIn = () => {
         console.warn("Back to sign in")
-        navigation.navigate('Sign In')
+        navigation.navigate('Log In')
     }
 
     const onNewCode = () => {
@@ -36,7 +36,7 @@ const ConfirmEmailScreen = () => {
 
 
                 <CustomButton text= "Request a new Code" onPress= {onNewCode} type="SECONDARY" ></CustomButton>
-                <CustomButton text= "Back to Sign In" onPress= {onSignIn} type="TERTIARY" ></CustomButton>
+                <CustomButton text= "Back to Sign In" onPress= {onLogIn} type="TERTIARY" ></CustomButton>
             </View>
         </ScrollView>
     )

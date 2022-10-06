@@ -15,9 +15,9 @@ const ForgotPasswordScreen = () => {
         navigation.navigate('Reset Password')
     }
 
-    const onSignIn = () => {
-        console.warn("Back to sign in")
-        navigation.navigate('Sign In')
+    const onLogIn = () => {
+        console.warn("Back to Log in")
+        navigation.navigate('Log In')
     }
 
   
@@ -30,7 +30,7 @@ const ForgotPasswordScreen = () => {
                 
                 <CustomButton text= "Submit" onPress= {onSendPressed} ></CustomButton>
 
-                <CustomButton text= "Back to Sign In" onPress= {onSignIn} type="TERTIARY" ></CustomButton>
+                <CustomButton text= "Back to Sign In" onPress= {onLogIn} type="TERTIARY" ></CustomButton>
             </View>
         </ScrollView>
     )
