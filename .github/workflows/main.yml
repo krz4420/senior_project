@@ -18,8 +18,8 @@ jobs:
         run: yarn install:mobile
       - name: Run Tests
         run: yarn test:mobile
-      - name: Build
-        run: yarn build:mobile
+      # - name: Build
+      #   run: yarn build:mobile
 
   test-and-build-server:
     name: Test & Build Server
