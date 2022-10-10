@@ -1,18 +1,47 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ScrollView, View, Text, Image, StyleSheet } from 'react-native'
 import CustomInput from '../components/CustomInput'
 import CustomButton from '../components/CustomButton'
 import { useNavigation } from '@react-navigation/native'
+import axios from 'axios';
 
-const ResetPasswordScreen = () => {
-    const [ code, setCode ] = useState('')
-    const [ password, setPassword] = useState('')
+
+const ResetPasswordScreen = ({route}) => {
+    const [ code, setCode ] = useState('');
+    const [ password, setPassword] = useState('');
+    const [ validFrom, setValidForm ] = useState(true);
+    const [ validPass, setValidPass ] = useState(true);
 
     const navigation = useNavigation()
 
+    useEffect (()=>{
+        const {email } = route.params;
+        axios.post('http://10.0.0.139:4000/ResetPassword/generateCode', {email}).catch(err => {
+            error = error.response.data.message;
+            setValidForm(false);
+        })
+    },[]);
+
     const onResetPasswordPressed = () => {
-        console.warn("reset")
-        navigation.navigate('Sign In')
+       
+        console.warn("reset");
+        if(password.length < 4){
+            setValidPass(false);
+            return;
+        }
+        const { username, email } = route.params;
+        axios.post('http://10.0.0.139:4000/ResetPassword/confirmReset', {code, password, username, email } ).then(res => {
+            console.log(res.data);
+
+            // If no error is returned then the information the user entered corresponds to an account
+            navigation.navigate('Reset Password')
+        }).catch(err =>{
+            error = err.response.data.message;
+            console.error(error);
+            // Set state for valid form to false to render error message
+            setValidForm(false);
+        });
+        
     }
 
     const onLogIn = () => {
@@ -24,18 +53,42 @@ const ResetPasswordScreen = () => {
         console.warn("Request New Code")
     }
 
-  
 
     return (
         <ScrollView showsVerticalScrollIndicator = { false }>
             <View style={styles.root}>
                 <Text style= {styles.title}>Reset your password</Text>
-                <CustomInput placeholder = "Code"  value={ code } setValue= { setCode }/>
-                <CustomInput placeholder = "Enter New Password"  value={ password } setValue= { setPassword }/>
-                
-                <CustomButton text= "Reset Password" onPress= { onResetPasswordPressed } ></CustomButton>
 
-                <CustomButton text= "Back to Sign In" onPress= { onLogIn } type="TERTIARY" ></CustomButton>
+                {validFrom ? null: <Text style={styles.error}>Incorrect Code</Text>}
+
+                <CustomInput 
+                    placeholder = "Code"  
+                    value={ code } 
+                    setValue= { setCode } 
+                    onFocus = { setValidForm }
+                    autoCapitalize = {false} 
+                    />
+
+                <CustomInput 
+                    placeholder = "Enter New Password"  
+                    value={ password } 
+                    setValue= { setPassword } 
+                    onFocus = { setValidPass }
+                    autoCapitalize = {false} 
+                    />
+
+                { validPass ? null: <Text style={styles.error}>Password must be at least 8 characters long!</Text>}
+
+                <CustomButton 
+                    text= "Reset Password" 
+                    onPress= { onResetPasswordPressed } 
+                />
+
+                <CustomButton 
+                    text= "Back to Sign In"
+                    onPress= { onLogIn } 
+                    type="TERTIARY" 
+                />
             </View>
         </ScrollView>
     )
@@ -58,7 +111,10 @@ const styles = StyleSheet.create({
     },
     link:{
         color:'#FdB075'
+    },
+    error:{
+        color:'red',
     }
 });
 
-export default ResetPasswordScreen
+export default ResetPasswordScreen;
