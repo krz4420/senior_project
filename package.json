@@ -19,6 +19,7 @@
     "test:server": "cd server && yarn test"
   },
   "dependencies": {
+    "@types/jest": "^29.1.2",
     "react-native": "0.69.6"
   }
 }
