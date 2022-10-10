@@ -9,7 +9,7 @@ router.post("/", async (req: Request, res: Response) => {
     const { username, password } = req.body;
       
     try{
-      const potentialUser = await User.findOne({ username});
+      const potentialUser = await User.findOne({ username });
       if(!potentialUser){
         res.status(401).json({message:"Invalid Credentials!", error: "User not found."})
       }else{

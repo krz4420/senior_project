@@ -15,19 +15,21 @@ const LogInScreen = () => {
     const [ validForm, setValidForm ] = useState(true);
 
     const onLogInPressed = () => {
-        console.warn("Log In")
-        // Validate TODO
+        // Extract user info from text input fields
         const userInfo = {username, password};
 
+        // TODO. Scrub data to protect against attacks
 
+        // Ping backend to see if data the user inputted corresponds to a valid account
         axios.post('http://10.0.0.139:4000/LogIn', userInfo).then(res => {
             console.log(res.data);
 
-            navigation.navigate('Home')
+            // If no error is returned then the information the user entered corresponds to an account
+            navigation.navigate('Home');
         }).catch(err =>{
-            error = err.response.data.message
+            error = err.response.data.message;
             console.warn(error);
-
+            // Set state for valid form to false to render error message
             setValidForm(false);
         });
 
@@ -37,24 +39,24 @@ const LogInScreen = () => {
     const clearState = () => {
         setUsername('');
         setPassword('');
+        setValidForm(true)
     }
 
     const onForgotPasswordPressed = () => {
-        console.warn("Forgor")
 
-        // clearState();
-        navigation.navigate('Forgot Password')
+        clearState();
+        navigation.navigate('Forgot Password');
     }
 
-    const onGoogleSignIn = () => {
-        console.warn("Google Sign In attemp")
-    }
+    // const onGoogleSignIn = () => {
+    //     console.warn("Google Sign In attemp")
+    // }
 
     const onSignUp = () => {
-        console.warn("Sign Up")
+        console.warn("Sign Up");
 
-        // clearState();
-        navigation.navigate('Sign Up')
+        clearState();
+        navigation.navigate('Sign Up');
     }
 
     const { height } = useWindowDimensions();
@@ -73,13 +75,17 @@ const LogInScreen = () => {
                     placeholder = "Username"  
                     value={ username} 
                     setValue= {setUsername}
-                    autoCapitalize= {false}/>
+                    autoCapitalize= {false}
+                    onFocus = {setValidForm}
+                    />
                 <CustomInput 
                     placeholder = "Password" 
                     value = {password} 
                     setValue = {setPassword} 
                     secureTextEntry
-                    autoCapitalize={false}/>
+                    autoCapitalize={false}
+                    onFocus = {setValidForm}
+                    />
                 <CustomButton 
                     text= "Sign In" 
                     onPress= {onLogInPressed} />
@@ -89,12 +95,12 @@ const LogInScreen = () => {
                     onPress= {onForgotPasswordPressed} 
                     type="TERTIARY"/>
 
-                <CustomButton 
+                {/* <CustomButton 
                     text= "Sign In with Google" 
                     onPress= {onGoogleSignIn} 
                     type="TERTIARY" 
                     bgColor='#FAE9EA' 
-                    fgColor='#DD4D44'/>
+                    fgColor='#DD4D44'/> */}
 
                 <CustomButton 
                     text= "Don't have an account? Sign up!" 

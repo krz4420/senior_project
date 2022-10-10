@@ -1,30 +1,22 @@
-import React, { useState } from 'react'
-import { View, StyleSheet } from 'react-native'
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
-const CustomInput = ( { value, setValue, placeholder, secureTextEntry, autoCapitalize, onEndEditing, onPressOut }) => {
-    const [ isFocused, setIsFocused ] = useState(false);
-
-    const handleFocus = () => {
-        setIsFocused(true);
-    };
-
-    const handleBlur = () => {
-        setIsFocused(false);
-    };
-
+const CustomInput = ( { value, setValue, placeholder, secureTextEntry, autoCapitalize, onEndEditing, onPressOut, onFocus }) => {
+   
     return (
         <View style={styles.container}>
             <TextInput 
                 value = { value } 
                 onChangeText = { setValue } 
                 label={ placeholder } 
-                styles= {[styles.input, `styles.label_${isFocused}`]}
+                styles= {styles.input}
                 secureTextEntry = { secureTextEntry } 
                 mode = 'outlined'
                 autoCapitalize= { autoCapitalize }
                 onEndEditing = {onEndEditing}
                 onPressOut = {onPressOut}
+                onFocus = {onFocus}
             />
         </View>
     )
