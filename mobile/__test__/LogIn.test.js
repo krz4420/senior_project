@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import Navigation from '../src/navigation';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
  describe('Testing Navigation to Sign Up Screen', () => {  
      test('clicking on one item takes you to the details screen', async () => {

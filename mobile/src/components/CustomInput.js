@@ -19,7 +19,7 @@ const CustomInput = ( { value, setValue, placeholder, secureTextEntry, autoCapit
                 onFocus = {onFocus}
             />
         </View>
-    )
+    );
 };
 
 const styles = StyleSheet.create({
