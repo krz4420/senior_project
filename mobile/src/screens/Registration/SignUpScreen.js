@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { ScrollView, View, Text, Image, StyleSheet, Keyboard } from 'react-native';
-import CustomInput from '../components/CustomInput';
-import CustomButton from '../components/CustomButton';
+import CustomInput from '../../components/CustomInput';
+import CustomButton from '../../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import {BACKENDPOINT} from '../../utils';
 
 const SignUpScreen = () => {
     const navigation = useNavigation();
@@ -57,7 +58,7 @@ const SignUpScreen = () => {
             const userInfo = { username, email, password };
 
             // Ping backend to see if the username or email is already taken
-            axios.post('http://10.0.0.139:4000/SignUp', userInfo).then(res => {
+            axios.post(`${BACKENDPOINT}/SignUp`, userInfo).then(res => {
                 console.log("Success")
                 console.log(res.data)
                 navigation.navigate('Log In')

@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { ScrollView, View, Text, Image, StyleSheet } from 'react-native'
-import CustomInput from '../components/CustomInput'
-import CustomButton from '../components/CustomButton'
+import CustomInput from '../../components/CustomInput'
+import CustomButton from '../../components/CustomButton'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios';
+import {BACKENDPOINT} from '../../utils';
 
 const ForgotPasswordScreen = () => {
     const [ username, setUsername ] = useState('');
@@ -13,8 +14,8 @@ const ForgotPasswordScreen = () => {
 
     const onSendPressed = () => {
         // Validate the username exists
-
-        axios.post('http://10.0.0.139:4000/ResetPassword/reset',{username} ).then(res => {
+        console.log(BACKENDPOINT);
+        axios.post(`${BACKENDPOINT}/ResetPassword/reset`, {username} ).then(res => {
             console.log(res.data);
             const email = res.data.email;
             // If no error is returned then the information the user entered corresponds to an account
@@ -78,4 +79,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default ForgotPasswordScreen
+export default ForgotPasswordScreen;

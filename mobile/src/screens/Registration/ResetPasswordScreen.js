@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { ScrollView, View, Text, Image, StyleSheet } from 'react-native'
-import CustomInput from '../components/CustomInput'
-import CustomButton from '../components/CustomButton'
+import CustomInput from '../../components/CustomInput'
+import CustomButton from '../../components/CustomButton'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios';
-
+import {BACKENDPOINT} from '../../utils';
 
 const ResetPasswordScreen = ({route}) => {
     const [ code, setCode ] = useState('');
@@ -15,8 +15,8 @@ const ResetPasswordScreen = ({route}) => {
     const navigation = useNavigation()
 
     useEffect (()=>{
-        const {email } = route.params;
-        axios.post('http://10.0.0.139:4000/ResetPassword/generateCode', {email}).catch(err => {
+        const { email } = route.params;
+        axios.post(`${BACKENDPOINT}/ResetPassword/generateCode`, {email}).catch(err => {
             error = error.response.data.message;
             setValidForm(false);
         })
@@ -27,21 +27,24 @@ const ResetPasswordScreen = ({route}) => {
         console.warn("reset");
         if(password.length < 4){
             setValidPass(false);
+            console.log("Error with password");
             return;
         }
+        
         const { username, email } = route.params;
-        axios.post('http://10.0.0.139:4000/ResetPassword/confirmReset', {code, password, username, email } ).then(res => {
+        axios.post(`${BACKENDPOINT}/ResetPassword/confirmReset`, {code, password, username, email } ).then(res => {
+            console.log("IN here on reset")
             console.log(res.data);
 
             // If no error is returned then the information the user entered corresponds to an account
-            navigation.navigate('Reset Password')
+            navigation.navigate('Log In');
         }).catch(err =>{
-            error = err.response.data.message;
+            error = err.response.data.message ? err.response.data.message : err.response;
             console.error(error);
             // Set state for valid form to false to render error message
             setValidForm(false);
         });
-        
+        console.log('DOne');
     }
 
     const onLogIn = () => {

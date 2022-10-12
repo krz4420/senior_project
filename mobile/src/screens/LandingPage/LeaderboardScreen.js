@@ -2,15 +2,13 @@ import React from 'react'
 import { View, Text} from 'react-native'
 
 
-const HomeScreen = () => {
+const LeaderBoardScreen = () => {
     return(
         <View>
-            <Text>
-                Home
-            </Text>
+            <Text>Leaderboard</Text>
         </View>
       
     )
 }
 
-export default HomeScreen
+export default LeaderBoardScreen;

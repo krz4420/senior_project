@@ -36,6 +36,10 @@ router.post("/reset", async (req: Request, res: Response) => {
 
 router.post("/generateCode", async (req: Request, res: Response) => {
    uniqueId = sendCode(req.body.email);
+
+   if (uniqueId == -1){
+    res.status(401).json({message:"Error generating code"});
+   }
 });
 
 router.post("/confirmReset", async (req: Request, res: Response) => {
@@ -49,7 +53,15 @@ router.post("/confirmReset", async (req: Request, res: Response) => {
     // The code the user entered matches the generated one.
     if (Number(code) == uniqueId){
         console.log("resetting")
-        resetPassword(req.body.password, req.body.username);
+
+        try{
+            resetPassword(req.body.password, req.body.username);
+        }catch(error){
+            return res.status(400).json(error);
+        }
+        return res.status(200).json({message: "success"});
+
+        
     }else{
         res.status(400).json({message:"Incorrect Code"})
     }
@@ -64,12 +76,13 @@ const resetPassword = async (newPassword: String, username:String) => {
               .then((user) => {
                 user.password = hash;
                 user.save();
+                
               })
               .catch((error) => {return error});
           });
         }
-    catch{
-        return 'error';
+    catch(error){ 
+        return error;
     }
     console.log("Resetting the password");
 };

@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { ScrollView, View, Text, Image, StyleSheet, useWindowDimensions } from 'react-native'
-import Logo from '../../assets/favicon.png'
-import CustomInput from '../components/CustomInput'
-import CustomButton from '../components/CustomButton'
+import Logo from '../../../assets/icon.png'
+import CustomInput from '../../components/CustomInput'
+import CustomButton from '../../components/CustomButton'
 import { useNavigation } from '@react-navigation/native'
-import axios from 'axios'
+import axios from 'axios';
+import {BACKENDPOINT} from '../../utils';
 
 const LogInScreen = () => {
     const navigation = useNavigation()
@@ -21,14 +22,14 @@ const LogInScreen = () => {
         // TODO. Scrub data to protect against attacks
 
         // Ping backend to see if data the user inputted corresponds to a valid account
-        axios.post('http://10.0.0.139:4000/LogIn', userInfo).then(res => {
+        axios.post(`${BACKENDPOINT}/LogIn`, userInfo).then(res => {
             console.log(res.data);
 
             // If no error is returned then the information the user entered corresponds to an account
             navigation.navigate('Home');
         }).catch(err =>{
-            error = err.response.data.message;
-            console.warn(error);
+            error = err.response.data ? err.response.data.message : err.response;
+            console.error(error);
             // Set state for valid form to false to render error message
             setValidForm(false);
         });
@@ -87,7 +88,7 @@ const LogInScreen = () => {
                     onFocus = {setValidForm}
                     />
                 <CustomButton 
-                    text= "Sign In" 
+                    text= "Log In" 
                     onPress= {onLogInPressed} />
 
                 <CustomButton 
@@ -115,6 +116,7 @@ const styles = StyleSheet.create({
     root:{
         alignItems:'center',
         padding: 20,
+        backgroundColor:'rgba(10, 39, 103, 0.2)'
     },
     logo:{
         width:'30%',
