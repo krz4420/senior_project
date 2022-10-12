@@ -1,2 +1,2 @@
-export * from "./Doggo";
+export * from "./Group";
 export * from "./User";
