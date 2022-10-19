@@ -14,6 +14,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.12.1",
     "@react-navigation/drawer": "^6.5.0",
     "@react-navigation/material-bottom-tabs": "^6.2.4",
     "@react-navigation/native": "^6.0.13",

@@ -1,11 +1,14 @@
 import { StyleSheet, SafeAreaView } from 'react-native';
 import Navigation from './src/navigation';
+import { AuthProvider } from './src/context/Auth';
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.container}>
-      <Navigation />
-    </SafeAreaView>
+    <AuthProvider>
+      <SafeAreaView style={styles.container}>
+        <Navigation />
+      </SafeAreaView>
+    </AuthProvider>
   );
 }
 
