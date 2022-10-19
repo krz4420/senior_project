@@ -17,7 +17,10 @@ router.post("/", async (req: Request, res: Response) => {
         result
           ? res.status(200).json({
               message: "Login successful",
-              potentialUser,
+              username:potentialUser.username,
+              email:potentialUser.email,
+              // groups:potentialUser.groups
+              groups:['Yale Lacrosse', 'Football']
             })
           : res.status(400).json({ message: "Login not succesful", error: "error"})
         })
