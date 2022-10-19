@@ -2,21 +2,25 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import Navigation from '../src/navigation';
 
- describe('Testing Navigation to Sign Up Screen', () => {  
-     test('clicking on one item takes you to the details screen', async () => {
-        const component = (
-            <Navigation />
-        );
+beforeAll(() => { 
+    jest.mock('@react-native-community/async-storage');
+});
 
-        render(<Navigation />);
-        const toClick = await screen.findByText(`Don't have an account? Sign up!`);
+describe('Testing Navigation to Sign Up Screen', () => {  
+    test('clicking on one item takes you to the details screen', async () => {
+    const component = (
+        <Navigation />
+    );
 
-        fireEvent(toClick, 'press');
-        const newHeader = await screen.findByText('Create an Account!');
+    render(<Navigation />);
+    const toClick = await screen.findByText(`Don't have an account? Sign up!`);
 
-        expect(newHeader).toBeTruthy();
-     });
- });
+    fireEvent(toClick, 'press');
+    const newHeader = await screen.findByText('Create an Account!');
+
+    expect(newHeader).toBeTruthy();
+    });
+});
 
 test('simple', ()=>{
     expect(1).toBeGreaterThan(0);
