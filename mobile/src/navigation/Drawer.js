@@ -5,36 +5,25 @@ import TabNav from './Tab';
 import JoinGroupScreen from '../screens/LandingPage/JoinGroupScreen';
 import CreateGroupScreen from '../screens/LandingPage/CreateGroupScreen';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAuth } from '../context/Auth';
 
 
 
 const Drawer = createDrawerNavigator();
 
 const DrawNav = () => {
+  const auth = useAuth();
+  const group = auth.authData.groups;
+
+  const list = group.map((groupName) => <Drawer.Screen name={groupName} component={TabNav} options={{
+    drawerIcon: ({ color }) => (
+      <MaterialCommunityIcons name="select-group" color={color} size={20} />
+    ),
+  }}/>)
+
   return (
       <Drawer.Navigator initialRouteName="Home">
-        <Drawer.Screen 
-            name="Group1" 
-            component={TabNav}
-            options={{
-                drawerLabel: 'Group1',
-                drawerIcon: ({ color }) => (
-                  <MaterialCommunityIcons name="select-group" color={color} size={20} />
-                ),
-              }}
-            />
-        <Drawer.Screen name="Group2" component={TabNav} options={{
-                drawerLabel: 'Group2',
-                drawerIcon: ({ color }) => (
-                  <MaterialCommunityIcons name="select-group" color={color} size={20} />
-                ),
-              }}/>
-        <Drawer.Screen name="Group3" component={TabNav} options={{
-                drawerLabel: 'Group3',
-                drawerIcon: ({ color }) => (
-                  <MaterialCommunityIcons name="select-group" color={color} size={20} />
-                ),
-              }}/>
+        {list}    
         <Drawer.Screen name="Join Group" component={JoinGroupScreen} options={{
                 drawerLabel: 'Join Group',
                 drawerIcon: ({ color }) => (

@@ -6,6 +6,7 @@ import CustomButton from '../../components/CustomButton'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios';
 import {BACKENDPOINT} from '../../utils';
+import { useAuth } from '../../context/Auth';
 
 const LogInScreen = () => {
     const navigation = useNavigation()
@@ -14,28 +15,43 @@ const LogInScreen = () => {
     const [ password, setPassword ] = useState('');
     
     const [ validForm, setValidForm ] = useState(true);
+    const auth = useAuth();
 
-    const onLogInPressed = () => {
+    const onLogInPressed =  () => {
+
+        // if(isFormEmpty){
+        //     console.error("Form is empty")
+        //     setValidForm(false);
+        //     return;
+        // }
+
         // Extract user info from text input fields
         const userInfo = {username, password};
 
-        // TODO. Scrub data to protect against attacks
+         // TODO. Scrub data to protect against attacks
 
-        // Ping backend to see if data the user inputted corresponds to a valid account
-        axios.post(`${BACKENDPOINT}/LogIn`, userInfo).then(res => {
-            console.log(res.data);
-
-            // If no error is returned then the information the user entered corresponds to an account
-            navigation.navigate('Home');
+        auth.signIn(userInfo).then(res => {
+            console.log("Successful login")
+            console.log(res)
         }).catch(err =>{
-            error = err.response.data ? err.response.data.message : err.response;
-            console.error(error);
+            console.error("Error")
+            console.error(err);
+            // error = err.response.data ? err.response.data.message : err.response;
+            
             // Set state for valid form to false to render error message
             setValidForm(false);
         });
 
-        // clearState();
     }
+    const isFormEmpty = () => {
+        const userData = [username, password];
+        console.log(username)
+        if(Object.values(userData).every(val => val.length == 0)){
+            return true;
+        }else{
+            return false;
+        }
+    };
 
     const clearState = () => {
         setUsername('');
