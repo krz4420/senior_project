@@ -9,12 +9,14 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const Tab = createMaterialBottomTabNavigator();
 
-const TabNav = () => {
+const TabNav = ( props ) => {
     return(
-          <Tab.Navigator screenOptions={{ headerShown: false }}>  
+          <Tab.Navigator initialRouteName = "Feed" screenOptions={{ headerShown: false }}>  
             <Tab.Screen 
+              
               name="Leaderboard" 
               component={LeaderBoardScreen} 
+              initialParams = {{groupName:props.route.name}}
               options={{
                 tabBarLabel: 'Leaderboard',
                 tabBarIcon: ({ color }) => (
@@ -24,8 +26,10 @@ const TabNav = () => {
             />
 
             <Tab.Screen 
+              group={props.route.name}
               name="Feed" 
               component={FeedScreen} 
+              initialParams = {{groupName:props.route.name}}
               options={{
                 tabBarLabel: 'Feed',
                 tabBarIcon: ({ color }) => (
@@ -35,8 +39,10 @@ const TabNav = () => {
               />
 
             <Tab.Screen 
+              group = {props.route.name}
               name="Create Post" 
               component={CreatePostScreen} 
+              initialParams = {{groupName:props.route.name}}
               options={{
                 tabBarLabel: 'Create Post',
                 tabBarIcon: ({ color }) => (
