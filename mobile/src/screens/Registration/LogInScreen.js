@@ -4,8 +4,6 @@ import Logo from '../../../assets/icon.png'
 import CustomInput from '../../components/CustomInput'
 import CustomButton from '../../components/CustomButton'
 import { useNavigation } from '@react-navigation/native'
-import axios from 'axios';
-import {BACKENDPOINT} from '../../utils';
 import { useAuth } from '../../context/Auth';
 
 const LogInScreen = () => {
@@ -19,11 +17,11 @@ const LogInScreen = () => {
 
     const onLogInPressed =  () => {
 
-        // if(isFormEmpty){
-        //     console.error("Form is empty")
-        //     setValidForm(false);
-        //     return;
-        // }
+        if(isFormEmpty()){
+            console.error("Form is empty")
+            setValidForm(false);
+            return;
+        }
 
         // Extract user info from text input fields
         const userInfo = {username, password};
