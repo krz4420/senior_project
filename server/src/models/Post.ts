@@ -3,6 +3,8 @@ import Group from "./Group";
 import User from './User';
 
 const PostSchema = new mongoose.Schema({
+    user: String,
+    group: String,
     title: {
         type: "string",
         required: true,
@@ -11,12 +13,15 @@ const PostSchema = new mongoose.Schema({
         type: "string",
     },
     likes: {
-        type: "int",
-        required: true,
+        type: "Number",
     },
-    
-
+    filename: {
+        type:"string"
+    },
+},
+{
+    timestamps: true,
 });
 
-export const Post = mongoose.model("Post", PostSchema);
+export const Post = mongoose.model("Posts", PostSchema);
 export default Post;
