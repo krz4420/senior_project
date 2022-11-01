@@ -7,7 +7,6 @@ const GroupSchema = new mongoose.Schema({
     unique: true,
   },
   
-  
 });
 
 export const Group = mongoose.model("Group", GroupSchema);

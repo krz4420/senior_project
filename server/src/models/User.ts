@@ -21,8 +21,7 @@ const UserSchema = new mongoose.Schema({
     default: "basic",
   },
   groups:{
-    type: mongoose.Schema.Types.ObjectId, 
-    ref:'Group',
+    type: ["string"],
     required: true
   }
 

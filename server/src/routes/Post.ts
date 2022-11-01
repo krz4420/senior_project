@@ -30,7 +30,7 @@ conn.once('open', () => {
 });
 
 const storage = new GridFsStorage({
-    url:mongoUri,
+    url: mongoUri,
     file:(req: any, file: any) => {
       return new Promise((resolve, reject)=>{
         const filename = `post-${Date.now()}${path.extname(file.originalname)}`;
@@ -70,18 +70,25 @@ router.post("/create/post", async (req: Request, res: Response) => {
 
 // Endpoints for fetching images and posts
 router.get("/retrieve/image", async (req, res) =>{
+  console.warn("IN HERE")
   const result = await gfs.files.findOne({filename:req.query.name});
   console.log(result);
-  const readStream = gridfsbucket.openDownloadStream(result._id);
-  // res.send("Sag")
-  readStream.pipe(res);
+
+  if(result != null){
+    const readStream = gridfsbucket.openDownloadStream(result._id);
+  
+    readStream.pipe(res);
+  }
+  
 });
 
 router.get("/retrieve/post", async (req, res) =>{
-  Post.find().then( data => {
+  const group = req.query.group;
+  console.log(group)
+  Post.find({group:group}).then( data => {
     console.log(data)
     data.sort((x, y) => {
-      return x.timestamps - y.timestamps;
+      return y.createdAt - x.createdAt;
     })
 
     return res.status(200).json(data);

@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { View, ScrollView, Text, Button, Image, StyleSheet } from 'react-native'
 import CustomInput from '../../components/CustomInput';
 import * as ImagePicker from 'expo-image-picker';
@@ -15,6 +15,17 @@ const CreatePostScreen = ( props ) => {
 
     const auth = useAuth();
 
+    useEffect(()=>{
+        const unsubscribe = props.navigation.addListener('focus', () => {
+            setTitle('');
+            setDescription('');
+            setMedia([]);
+            setValidForm(true);
+        });
+        return unsubscribe;
+     }, [props.navigation]);
+
+    
     const pickImage = async () => {
         setValidForm(true);
         let result = await ImagePicker.launchImageLibraryAsync({
