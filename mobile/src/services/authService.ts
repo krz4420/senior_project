@@ -9,16 +9,12 @@ export type AuthData = {
   };
 
   const signIn = async (userInfo): Promise<AuthData> => {
-    // this is a mock of an API call, in a real app
-    // will be need connect with some real API,
-    // send email and password, and if credential is corret
-    // the API will resolve with some token and another datas as the below
     console.log("Sign in")
     const promise:AuthData = await new Promise( (resolve, reject) => {
       
       axios.post(`${BACKENDPOINT}/LogIn`, userInfo).then(res => {
         const data: AuthData = {token:JWTTokenMock, username:res.data.username, email:res.data.email, groups:res.data.groups}
-        resolve(data)
+        resolve(data);
       }).catch(error => {
         console.log("Error in auth service sign in")
         reject(Error("Incorrect Credentials"))

@@ -1,5 +1,7 @@
 import cors from "cors";
 import express from "express";
+import multer from "multer";
+
 import { isCI, isDevelopment, isTest } from "./utils/environment";
 import routes from "./routes";
 
@@ -20,6 +22,8 @@ const app = express()
   .use(cors(corsOptions))
   .use(express.json())
   .use(express.urlencoded({ extended: true }))
-  .use(routes);
+  .use(routes)
+  .use(multer().any());
+
 
 export default app;
