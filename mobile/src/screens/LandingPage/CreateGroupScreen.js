@@ -25,6 +25,7 @@ const CreateGroupScreen = () => {
           console.log(res);
           auth.updateGroup(groupId, auth.authData);
           alert(`Successfull created ${groupId}`);
+          a;
         })
         .catch((error) => {
           console.error(error.response.data);
