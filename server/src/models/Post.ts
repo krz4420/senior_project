@@ -1,27 +1,36 @@
 import mongoose from "mongoose";
 import Group from "./Group";
-import User from './User';
+import User from "./User";
 
-const PostSchema = new mongoose.Schema({
+const PostSchema = new mongoose.Schema(
+  {
     user: String,
     group: String,
     title: {
-        type: "string",
-        required: true,
+      type: "string",
+      required: true,
     },
-    comments: {
-        type: "string",
-    },
+    description: String,
+    comments: [
+      {
+        type: String,
+      },
+    ],
     likes: {
-        type: "Number",
+      type: "Number",
+      default: 0,
     },
-    filename: {
-        type:"string"
-    },
-},
-{
+    file: [
+      {
+        filename: String,
+        filetype: String,
+      },
+    ],
+  },
+  {
     timestamps: true,
-});
+  }
+);
 
 export const Post = mongoose.model("Posts", PostSchema);
 export default Post;
