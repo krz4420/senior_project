@@ -10,21 +10,20 @@ const UserSchema = new mongoose.Schema({
     type: "string",
     required: true,
   },
-  email:{
-    type:"string",
-    required:true,
+  email: {
+    type: "string",
+    required: true,
     unique: true,
   },
-  role:{
-    type:"string",
+  role: {
+    type: "string",
     required: true,
     default: "basic",
   },
-  groups:{
+  groups: {
     type: ["string"],
-    required: true
-  }
-
+    required: true,
+  },
 });
 
 export const User = mongoose.model("User", UserSchema);

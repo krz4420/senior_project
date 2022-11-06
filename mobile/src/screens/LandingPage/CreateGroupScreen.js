@@ -25,7 +25,6 @@ const CreateGroupScreen = () => {
           console.log(res);
           auth.updateGroup(groupId, auth.authData);
           alert(`Successfull created ${groupId}`);
-          a;
         })
         .catch((error) => {
           console.error(error.response.data);
@@ -33,11 +32,11 @@ const CreateGroupScreen = () => {
             setGroupIdNotTaken(false);
             return;
           } else {
-            // Either display success message or navigate the user to the feed for the group they just created.
+            setValidId(false);
+            return;
           }
         });
     }
-    console.warn("Submit");
   };
 
   const handleValidGroupId = (e) => {
