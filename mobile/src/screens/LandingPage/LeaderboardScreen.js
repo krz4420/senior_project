@@ -15,13 +15,13 @@ const LeaderBoardScreen = (props) => {
       .get(
         `${BACKENDPOINT}/Leaderboard?group=${props.route.params.groupName}&startDate=${startDate}&endDate=${endDate}`
       )
+      // Data that we are handed back is an array of key value pairs in the form of username and postCount
       .then((res) => {
-        console.log(res.data);
-
+        // Sort the array by the postCount for each user
         const sortedData = res.data.sort((x, y) => {
           return y.postCount - x.postCount;
         });
-        console.log(sortedData);
+        // Update the state to reflect the sorted array of users from those with the largest post count to smallest
         setUsers(sortedData);
       })
       .catch((err) => {
@@ -29,12 +29,14 @@ const LeaderBoardScreen = (props) => {
       });
   };
 
+  // When the user navigates to this screen (we tell if isFocused is true) then we fetch leaderboard stats
   useEffect(() => {
     if (isFocused) {
       fetchFeed(Date.now(), null);
     }
   }, [isFocused]);
 
+  // Helper function to handle finding the start and end date for the filtering functionality
   const handleFilter = (range) => {
     const startDate = new Date(Date.now());
     let endDate = null;
