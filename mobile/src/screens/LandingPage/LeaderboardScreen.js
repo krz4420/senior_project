@@ -34,85 +34,115 @@ const LeaderBoardScreen = (props) => {
 
   const membersRanked = users.map((user, index) => {
     return (
-      <View style={styles.tableRow} key={index}>
-        <Text>{index + 1}</Text>
-        <Text>{user.username}</Text>
-        <Text>{user.postCount}</Text>
-      </View>
+      <>
+        <View style={styles.tableRow} key={index}>
+          <Text>{index + 1}</Text>
+          <Text>{user.username}</Text>
+          <Text style={{ alignSelf: "center" }}>{user.postCount}</Text>
+        </View>
+        <View
+          style={[
+            styles.divider,
+            { marginBottom: 5, borderBottomColor: "#eaeaea" },
+          ]}
+        />
+      </>
     );
   });
 
   return (
     <View>
-      <View style={styles.topThree}>
-        <View style={styles.second}>
-          <View style={{ position: "relative" }}>
-            <MaterialCommunityIcons
-              style={styles.avatar}
-              name={"account"}
-              size={90}
-            />
-            <MaterialCommunityIcons
-              style={[styles.trophy]}
-              name={"trophy"}
-              size={50}
-              color={"silver"}
-            />
-            <Text style={[styles.text, styles.third_text]}>2</Text>
-          </View>
-          <Text>Joe</Text>
-        </View>
-        <View style={styles.first}>
-          <View style={{ position: "relative" }}>
-            <MaterialCommunityIcons
-              style={styles.avatar}
-              name={"account"}
-              size={135}
-            />
-            <MaterialCommunityIcons
-              style={styles.trophy}
-              name={"trophy"}
-              size={60}
-              color="gold"
-            />
-            <Text
-              style={[{ fontSize: 25, fontWeight: "bold" }, styles.third_text]}
-            >
-              1
-            </Text>
-          </View>
+      {users.length >= 1 ? (
+        <View style={[styles.topThree, { marginBottom: 5 }]}>
+          {users.length >= 2 ? (
+            <View style={styles.second}>
+              <View style={{ position: "relative" }}>
+                <MaterialCommunityIcons
+                  style={styles.avatar}
+                  name={"account"}
+                  size={90}
+                />
+                <MaterialCommunityIcons
+                  style={[styles.trophy]}
+                  name={"trophy"}
+                  size={50}
+                  color={"silver"}
+                />
+                <Text style={[styles.text, styles.third_text]}>2</Text>
+              </View>
+              <Text style={{ fontWeight: "bold" }}>{users[1].username}</Text>
+            </View>
+          ) : null}
+          {users.length >= 1 ? (
+            <View style={styles.first}>
+              <View style={{ position: "relative" }}>
+                <MaterialCommunityIcons
+                  style={styles.avatar}
+                  name={"account"}
+                  size={135}
+                />
+                <MaterialCommunityIcons
+                  style={styles.trophy}
+                  name={"trophy"}
+                  size={60}
+                  color="gold"
+                />
+                <Text
+                  style={[
+                    { fontSize: 25, fontWeight: "bold" },
+                    styles.third_text,
+                  ]}
+                >
+                  1
+                </Text>
+              </View>
 
-          <Text>Mama</Text>
+              <Text style={{ fontWeight: "bold" }}>{users[0].username}</Text>
+            </View>
+          ) : null}
+          {users.length >= 3 ? (
+            <View style={styles.third}>
+              <View style={{ position: "relative" }}>
+                <MaterialCommunityIcons
+                  style={styles.avatar}
+                  name={"account"}
+                  size={90}
+                />
+                <MaterialCommunityIcons
+                  style={styles.trophy}
+                  name={"trophy"}
+                  size={50}
+                  color="#CD7F32"
+                />
+                <Text style={[styles.third_text, styles.text]}>3</Text>
+              </View>
+              <Text style={{ fontWeight: "bold" }}>{users[2].username}</Text>
+            </View>
+          ) : null}
         </View>
-        <View style={styles.third}>
-          <View style={{ position: "relative" }}>
-            <MaterialCommunityIcons
-              style={styles.avatar}
-              name={"account"}
-              size={90}
-            />
-            <MaterialCommunityIcons
-              style={styles.trophy}
-              name={"trophy"}
-              size={50}
-              color="#CD7F32"
-            />
-            <Text style={[styles.third_text, styles.text]}>3</Text>
-          </View>
-          <Text>Kyle</Text>
-        </View>
-      </View>
+      ) : null}
+      <View style={[styles.divider]} />
       <View style={styles.col}>
         <Text style={styles.text}>Rank</Text>
         <Text style={styles.text}>Member</Text>
         <Text style={styles.text}>Posts</Text>
       </View>
-      <ScrollView>{membersRanked}</ScrollView>
+      <View style={[styles.divider, { marginBottom: 5 }]} />
+      <ScrollView style={styles.table}>{membersRanked}</ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  table: {
+    height: "100%",
+  },
+  divider: {
+    borderBottomColor: "#cdcdcd",
+    borderBottomWidth: 1,
+    width: "100%",
+    alignSelf: "center",
+  },
   text: {
     fontWeight: "bold",
     fontSize: "18",
@@ -128,6 +158,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginHorizontal: 20,
+    marginVertical: 5,
   },
   avatar: {
     zIndex: 0,
@@ -149,7 +180,8 @@ const styles = StyleSheet.create({
   col: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginHorizontal: 20,
+    paddingHorizontal: 10,
+    backgroundColor: "#e5e5e5",
   },
 });
 
