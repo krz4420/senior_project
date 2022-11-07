@@ -3,9 +3,20 @@ import { Group, Post, User } from "../models";
 const router = Router();
 
 router.get("/", async (req: Request, res: Response) => {
-  console.log(req.query.group);
   let userPostFrequency: any = {};
-  Post.find({ group: req.query.group })
+
+  const query =
+    req.query.endDate != "null"
+      ? {
+          group: req.query.group,
+          createdAt: {
+            $gte: req.query.endDate,
+            $lte: req.query.startDate,
+          },
+        }
+      : { group: req.query.group };
+
+  Post.find(query)
     .then((data: any) => {
       data.map((post: any) => {
         if (userPostFrequency[post.user]) {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, StyleSheet, Text, ScrollView } from "react-native";
+import { View, StyleSheet, Text, ScrollView, Pressable } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import axios from "axios";
 import { BACKENDPOINT } from "../../utils";
@@ -8,10 +8,13 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 const LeaderBoardScreen = (props) => {
   const isFocused = useIsFocused();
   const [users, setUsers] = useState([]);
+  const [filter, setFilter] = useState("All time");
 
-  const fetchFeed = () => {
+  const fetchFeed = (startDate, endDate) => {
     axios
-      .get(`${BACKENDPOINT}/Leaderboard?group=${props.route.params.groupName}`)
+      .get(
+        `${BACKENDPOINT}/Leaderboard?group=${props.route.params.groupName}&startDate=${startDate}&endDate=${endDate}`
+      )
       .then((res) => {
         console.log(res.data);
 
@@ -28,13 +31,31 @@ const LeaderBoardScreen = (props) => {
 
   useEffect(() => {
     if (isFocused) {
-      fetchFeed();
+      fetchFeed(Date.now(), null);
     }
   }, [isFocused]);
 
+  const handleFilter = (range) => {
+    const startDate = new Date(Date.now());
+    let endDate = null;
+
+    switch (range) {
+      case "All time":
+        break;
+      case "7 days":
+        endDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case "30 days":
+        endDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        break;
+    }
+    fetchFeed(startDate, endDate);
+    setFilter(range);
+  };
+
   const membersRanked = users.map((user, index) => {
     return (
-      <>
+      <View key={index}>
         <View style={styles.tableRow} key={index}>
           <Text>{index + 1}</Text>
           <Text>{user.username}</Text>
@@ -46,81 +67,102 @@ const LeaderBoardScreen = (props) => {
             { marginBottom: 5, borderBottomColor: "#eaeaea" },
           ]}
         />
-      </>
+      </View>
     );
   });
 
   return (
     <View>
       {users.length >= 1 ? (
-        <View style={[styles.topThree, { marginBottom: 5 }]}>
-          {users.length >= 2 ? (
-            <View style={styles.second}>
-              <View style={{ position: "relative" }}>
-                <MaterialCommunityIcons
-                  style={styles.avatar}
-                  name={"account"}
-                  size={90}
-                />
-                <MaterialCommunityIcons
-                  style={[styles.trophy]}
-                  name={"trophy"}
-                  size={50}
-                  color={"silver"}
-                />
-                <Text style={[styles.text, styles.third_text]}>2</Text>
+        <>
+          <View style={[styles.topThree, { marginBottom: 5 }]}>
+            {users.length >= 2 ? (
+              <View style={styles.second}>
+                <View style={{ position: "relative" }}>
+                  <MaterialCommunityIcons
+                    style={styles.avatar}
+                    name={"account"}
+                    size={90}
+                  />
+                  <MaterialCommunityIcons
+                    style={[styles.trophy]}
+                    name={"trophy"}
+                    size={50}
+                    color={"silver"}
+                  />
+                  <Text style={[styles.text, styles.third_text]}>2</Text>
+                </View>
+                <Text style={{ fontWeight: "bold" }}>{users[1].username}</Text>
               </View>
-              <Text style={{ fontWeight: "bold" }}>{users[1].username}</Text>
-            </View>
-          ) : null}
-          {users.length >= 1 ? (
-            <View style={styles.first}>
-              <View style={{ position: "relative" }}>
-                <MaterialCommunityIcons
-                  style={styles.avatar}
-                  name={"account"}
-                  size={135}
-                />
-                <MaterialCommunityIcons
-                  style={styles.trophy}
-                  name={"trophy"}
-                  size={60}
-                  color="gold"
-                />
-                <Text
-                  style={[
-                    { fontSize: 25, fontWeight: "bold" },
-                    styles.third_text,
-                  ]}
-                >
-                  1
-                </Text>
-              </View>
+            ) : null}
+            {users.length >= 1 ? (
+              <View style={styles.first}>
+                <View style={{ position: "relative" }}>
+                  <MaterialCommunityIcons
+                    style={styles.avatar}
+                    name={"account"}
+                    size={135}
+                  />
+                  <MaterialCommunityIcons
+                    style={styles.trophy}
+                    name={"trophy"}
+                    size={60}
+                    color="gold"
+                  />
+                  <Text
+                    style={[
+                      { fontSize: 25, fontWeight: "bold" },
+                      styles.third_text,
+                    ]}
+                  >
+                    1
+                  </Text>
+                </View>
 
-              <Text style={{ fontWeight: "bold" }}>{users[0].username}</Text>
-            </View>
-          ) : null}
-          {users.length >= 3 ? (
-            <View style={styles.third}>
-              <View style={{ position: "relative" }}>
-                <MaterialCommunityIcons
-                  style={styles.avatar}
-                  name={"account"}
-                  size={90}
-                />
-                <MaterialCommunityIcons
-                  style={styles.trophy}
-                  name={"trophy"}
-                  size={50}
-                  color="#CD7F32"
-                />
-                <Text style={[styles.third_text, styles.text]}>3</Text>
+                <Text style={{ fontWeight: "bold" }}>{users[0].username}</Text>
               </View>
-              <Text style={{ fontWeight: "bold" }}>{users[2].username}</Text>
-            </View>
-          ) : null}
-        </View>
+            ) : null}
+            {users.length >= 3 ? (
+              <View style={styles.third}>
+                <View style={{ position: "relative" }}>
+                  <MaterialCommunityIcons
+                    style={styles.avatar}
+                    name={"account"}
+                    size={90}
+                  />
+                  <MaterialCommunityIcons
+                    style={styles.trophy}
+                    name={"trophy"}
+                    size={50}
+                    color="#CD7F32"
+                  />
+                  <Text style={[styles.third_text, styles.text]}>3</Text>
+                </View>
+                <Text style={{ fontWeight: "bold" }}>{users[2].username}</Text>
+              </View>
+            ) : null}
+          </View>
+          <View style={[styles.divider]} />
+          <View style={[styles.tableRow, { marginHorizontal: 60 }]}>
+            <Pressable onPress={() => handleFilter("7 days")}>
+              <Text style={filter == "7 days" ? styles.active : null}>
+                7 days
+              </Text>
+            </Pressable>
+            <Pressable onPress={() => handleFilter("30 days")}>
+              <Text style={filter == "30 days" ? styles.active : null}>
+                30 Days
+              </Text>
+            </Pressable>
+            <Pressable onPress={() => handleFilter("All time")}>
+              <Text style={filter == "All time" ? styles.active : null}>
+                All Time
+              </Text>
+            </Pressable>
+          </View>
+        </>
       ) : null}
+
       <View style={[styles.divider]} />
       <View style={styles.col}>
         <Text style={styles.text}>Rank</Text>
@@ -134,6 +176,9 @@ const LeaderBoardScreen = (props) => {
 };
 
 const styles = StyleSheet.create({
+  active: {
+    fontWeight: "bold",
+  },
   table: {
     height: "100%",
   },
