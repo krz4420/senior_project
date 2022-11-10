@@ -32,6 +32,7 @@ const LeaderBoardScreen = (props) => {
   // When the user navigates to this screen (we tell if isFocused is true) then we fetch leaderboard stats
   useEffect(() => {
     if (isFocused) {
+      setFilter("All time");
       fetchFeed(Date.now(), null);
     }
   }, [isFocused]);
