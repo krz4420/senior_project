@@ -56,7 +56,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   const signIn = async (userInfo) => {
     try {
       const _authData = await authService.signIn(userInfo);
-
+      console.log(_authData.userId);
       //Set the data in the context, so the App can be notified
       //and send the user to the AuthStack
       setAuthData(_authData);

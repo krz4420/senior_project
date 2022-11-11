@@ -10,9 +10,20 @@ import {
 import { BACKENDPOINT } from "../utils";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Video } from "expo-av";
+import axios from "axios";
 
-const Post = ({ title, description, author, timestamp, files }) => {
+const Post = ({
+  title,
+  description,
+  author,
+  timestamp,
+  files,
+  likes,
+  comments,
+  id,
+}) => {
   const [isLiked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(likes);
   const monthNames = [
     "Jan",
     "Feb",
@@ -53,8 +64,21 @@ const Post = ({ title, description, author, timestamp, files }) => {
     }
   };
 
-  const handleLikePress = () => {
-    setLiked(!isLiked);
+  const handleLikePress = (totalLikes) => {
+    let likes = totalLikes;
+    if (isLiked) {
+      setLiked(false);
+      setLikeCount(likes - 1);
+      likes -= 1;
+    } else {
+      setLiked(true);
+      setLikeCount(likes + 1);
+      likes += 1;
+    }
+    console.log(likes);
+
+    axios.post(`${BACKENDPOINT}/Post/like`, { likes, id });
+
     // TODO call the backend and update the number of likes for this post
   };
 
@@ -115,12 +139,17 @@ const Post = ({ title, description, author, timestamp, files }) => {
       {description ? <Text>{description}</Text> : null}
       <View style={styles.divider} />
       <View style={styles.interactionWrapper}>
-        <TouchableOpacity style={styles.likeWrapper} onPress={handleLikePress}>
+        <TouchableOpacity
+          style={styles.likeWrapper}
+          onPress={() => handleLikePress(likeCount)}
+        >
           <MaterialCommunityIcons
             name={isLiked ? "heart" : "heart-outline"}
             size="25"
           />
-          <Text style={{ marginTop: 3 }}>Like</Text>
+          <Text style={{ marginTop: 3 }}>
+            {likeCount == 1 ? `1 Like` : `${likeCount} Likes`}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.likeWrapper}

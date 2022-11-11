@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, RefreshControl, SafeAreaView } from "react-native";
 import { BACKENDPOINT } from "../../utils";
 import Post from "../../components/Post";
+import { useAuth } from "../../context/Auth";
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -12,6 +13,7 @@ const wait = (timeout) => {
 const FeedScreen = (props) => {
   const [postsData, setPostsData] = useState([]);
   const isFocused = useIsFocused();
+  const auth = useAuth();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -35,13 +37,14 @@ const FeedScreen = (props) => {
   };
 
   useEffect(() => {
+    console.log("user ID", auth.authData.userId);
     if (isFocused) {
       fetchFeed();
     }
   }, [isFocused]);
 
   const posts = postsData.map((post) => {
-    console.log(post);
+    // console.log(post);
     let files;
     if (post.file.length == 0) {
       files = [{ filename: post.filename, filetype: "image" }];

@@ -27,6 +27,7 @@ conn.once("open", () => {
   gfs = Grid(conn.db, mongoose.mongo);
   gfs.collection("posts"); // Has to be the same as the bucketName
 });
+
 const handleVideoUpload = (file: any) => {
   console.log(file);
 };
@@ -121,7 +122,20 @@ router.get("/retrieve/post", async (req, res) => {
     });
 });
 
-router.post("/like", async (req, res) => {});
+router.post("/like", async (req, res) => {
+  const { likes, id } = req.body;
+
+  console.log(likes);
+  console.log(id);
+  Post.findOneAndUpdate({ _id: id }, { likes: Number(likes) })
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(400).json(error);
+    });
+});
 
 router.post("/comment", async (req, res) => {});
 
