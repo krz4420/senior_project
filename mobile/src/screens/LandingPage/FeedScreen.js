@@ -29,6 +29,7 @@ const FeedScreen = (props) => {
         `${BACKENDPOINT}/Post/retrieve/post?group=${props.route.params.groupName}`
       )
       .then((res) => {
+        console.log(res.data);
         setPostsData(res.data);
       })
       .catch((err) => {
@@ -37,20 +38,23 @@ const FeedScreen = (props) => {
   };
 
   useEffect(() => {
-    console.log("user ID", auth.authData.userId);
     if (isFocused) {
       fetchFeed();
     }
   }, [isFocused]);
 
   const posts = postsData.map((post) => {
-    // console.log(post);
     let files;
     if (post.file.length == 0) {
       files = [{ filename: post.filename, filetype: "image" }];
     } else {
       files = post.file;
     }
+
+    let hasUserLikedPost = post.likes.includes(auth.authData.userId)
+      ? true
+      : false;
+
     return (
       <Post
         key={post._id}
@@ -59,9 +63,10 @@ const FeedScreen = (props) => {
         author={post.user}
         timestamp={post.createdAt}
         description={post.description ? post.description : null}
-        likes={post.likes}
+        likes={post.likes.length}
         comments={post.comments}
         id={post._id}
+        hasUserLikedPost={hasUserLikedPost}
       />
     );
   });

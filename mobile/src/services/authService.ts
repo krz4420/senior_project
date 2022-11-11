@@ -21,7 +21,7 @@ const signIn = async (userInfo): Promise<AuthData> => {
           username: res.data.username,
           email: res.data.email,
           groups: res.data.groups,
-          userId: "Hello",
+          userId: res.data.userID,
         };
         resolve(data);
       })

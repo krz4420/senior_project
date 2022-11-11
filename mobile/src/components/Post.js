@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import { BACKENDPOINT } from "../utils";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Video } from "expo-av";
 import axios from "axios";
+import { useAuth } from "../context/Auth";
 
 const Post = ({
   title,
@@ -21,9 +22,11 @@ const Post = ({
   likes,
   comments,
   id,
+  hasUserLikedPost,
 }) => {
   const [isLiked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
+  const auth = useAuth();
   const monthNames = [
     "Jan",
     "Feb",
@@ -64,6 +67,10 @@ const Post = ({
     }
   };
 
+  useEffect(() => {
+    hasUserLikedPost ? setLiked(true) : setLiked(false);
+  }, []);
+
   const handleLikePress = (totalLikes) => {
     let likes = totalLikes;
     if (isLiked) {
@@ -77,7 +84,14 @@ const Post = ({
     }
     console.log(likes);
 
-    axios.post(`${BACKENDPOINT}/Post/like`, { likes, id });
+    axios
+      .post(`${BACKENDPOINT}/Post/like`, {
+        postID: id,
+        userID: auth.authData.userId,
+      })
+      .then((data) => {
+        console.log(data);
+      });
 
     // TODO call the backend and update the number of likes for this post
   };

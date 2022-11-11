@@ -123,18 +123,23 @@ router.get("/retrieve/post", async (req, res) => {
 });
 
 router.post("/like", async (req, res) => {
-  const { likes, id } = req.body;
+  const { postID, userID } = req.body;
 
-  console.log(likes);
-  console.log(id);
-  Post.findOneAndUpdate({ _id: id }, { likes: Number(likes) })
-    .then((data) => {
-      console.log(data);
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(400).json(error);
-    });
+  console.log(postID);
+  console.log(userID);
+  try {
+    const post = await Post.findById(postID);
+
+    if (!post.likes.includes(userID)) {
+      await post.updateOne({ $push: { likes: userID } });
+      res.status(200).json("Post has been liked");
+    } else {
+      await post.updateOne({ $pull: { likes: userID } });
+      res.status(200).json("Post has been disliked");
+    }
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
 
 router.post("/comment", async (req, res) => {});

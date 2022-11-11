@@ -15,10 +15,7 @@ const PostSchema = new mongoose.Schema(
         by: mongoose.Schema.Types.ObjectId,
       },
     ],
-    likes: {
-      type: "Number",
-      default: 0,
-    },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
     file: [
       {
         filename: String,
