@@ -69,17 +69,18 @@ const Post = ({
 
   useEffect(() => {
     hasUserLikedPost ? setLiked(true) : setLiked(false);
-  }, []);
+    setLikeCount(likes);
+  }, [likes, hasUserLikedPost]);
 
   const handleLikePress = (totalLikes) => {
-    let likes = totalLikes;
+    let totLikes = totalLikes;
     if (isLiked) {
       setLiked(false);
-      setLikeCount(likes - 1);
+      setLikeCount(totLikes - 1);
       likes -= 1;
     } else {
       setLiked(true);
-      setLikeCount(likes + 1);
+      setLikeCount(totLikes + 1);
       likes += 1;
     }
     console.log(likes);

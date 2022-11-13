@@ -50,7 +50,7 @@ const FeedScreen = (props) => {
     } else {
       files = post.file;
     }
-
+    console.log("POST LIKES", post.likes);
     let hasUserLikedPost = post.likes.includes(auth.authData.userId)
       ? true
       : false;

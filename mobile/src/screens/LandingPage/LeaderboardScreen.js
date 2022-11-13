@@ -9,19 +9,31 @@ const LeaderBoardScreen = (props) => {
   const isFocused = useIsFocused();
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("All time");
-
   const fetchFeed = (startDate, endDate) => {
     axios
       .get(
         `${BACKENDPOINT}/Leaderboard?group=${props.route.params.groupName}&startDate=${startDate}&endDate=${endDate}`
       )
       // Data that we are handed back is an array of key value pairs in the form of username and postCount
-      .then((res) => {
+      .then(({ data }) => {
+        const { userPostCount, totalUsers } = data;
+        console.log(userPostCount);
+        console.log(totalUsers);
         // Sort the array by the postCount for each user
-        const sortedData = res.data.sort((x, y) => {
+        const sortedData = userPostCount.sort((x, y) => {
           return y.postCount - x.postCount;
         });
         // Update the state to reflect the sorted array of users from those with the largest post count to smallest
+        console.log(sortedData);
+        totalUsers.map((user) => {
+          console.log(user);
+          if (
+            !sortedData.some((userWhoPosted) => userWhoPosted.username == user)
+          ) {
+            sortedData.push({ postCount: 0, username: user });
+          }
+        });
+
         setUsers(sortedData);
       })
       .catch((err) => {
@@ -46,10 +58,14 @@ const LeaderBoardScreen = (props) => {
       case "All time":
         break;
       case "7 days":
-        endDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        // endDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        endDate = new Date(Date.now() - 30 * 60 * 1000);
+
         break;
       case "30 days":
-        endDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        endDate = new Date(Date.now() - 16 * 60 * 60 * 1000);
+
+        // endDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
         break;
     }
     fetchFeed(startDate, endDate);
