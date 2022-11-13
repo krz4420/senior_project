@@ -16,7 +16,11 @@ const CreateGroupScreen = () => {
     if (!isValidId || !isGroupIdNotTaken) {
       return;
     } else {
-      const data = { groupname: groupId, username: auth.authData.username };
+      const data = {
+        groupname: groupId,
+        username: auth.authData.username,
+        userID: auth.authData.userId,
+      };
 
       // Check if the group id is already taken
       axios
