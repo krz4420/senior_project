@@ -174,7 +174,9 @@ const Post = ({
           onPress={handleCommentPress}
         >
           <MaterialCommunityIcons name={"chat-outline"} size="25" />
-          <Text style={{ marginTop: 3 }}>Comment</Text>
+          <Text style={{ marginTop: 3 }}>
+            {comments.length == 0 ? "Comment" : `${comments.length} Comments`}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

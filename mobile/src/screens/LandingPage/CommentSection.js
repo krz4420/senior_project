@@ -92,7 +92,9 @@ const CommentSection = (props) => {
 
   return (
     <View style={{ backgroundColor: "#F9FBFC" }}>
-      <ScrollView style={{ marginTop: 60, bottom: keyboardOffset + 60 }}>
+      <ScrollView
+        style={{ marginTop: 60 + keyboardOffset, bottom: keyboardOffset + 60 }}
+      >
         <Comment author={author} time={timestamp} body={description} />
         <View style={styles.divider} />
         {commentsView}

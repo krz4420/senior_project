@@ -12,7 +12,6 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { useAuth } from "../context/Auth";
 
 const Comment = ({ author, time, body }) => {
-  const auth = useAuth();
   const monthNames = [
     "Jan",
     "Feb",
@@ -60,10 +59,10 @@ const Comment = ({ author, time, body }) => {
           name={"account"}
           size={35}
         />
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+        <Text style={{ flexDirection: "row", flexWrap: "wrap", width: "90%" }}>
           <Text style={{ fontSize: 14, fontWeight: "bold" }}>{author} </Text>
           <Text style={{ fontSize: 14 }}>{body}</Text>
-        </View>
+        </Text>
       </View>
       <Text style={{ fontSize: 12, color: "#666" }}>
         {calculateTimeDifference()}
@@ -73,11 +72,6 @@ const Comment = ({ author, time, body }) => {
 };
 
 const styles = StyleSheet.create({
-  imageContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-  },
   userInfo: {
     flexDirection: "row",
     justifyContent: "flex-start",
@@ -95,7 +89,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginVertical: 2,
+    margin: 2,
   },
 });
 
