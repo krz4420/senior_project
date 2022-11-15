@@ -145,6 +145,7 @@ const CreatePostScreen = (props) => {
         setValue={setDescription}
         autoCapitalize={false}
         onFocus={setValidForm}
+        multiline={true}
       />
       <Button
         title="Pick images or videos from your camera roll"

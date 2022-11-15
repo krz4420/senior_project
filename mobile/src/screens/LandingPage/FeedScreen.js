@@ -29,11 +29,10 @@ const FeedScreen = (props) => {
         `${BACKENDPOINT}/Post/retrieve/post?group=${props.route.params.groupName}`
       )
       .then((res) => {
-        console.log(res.data);
         setPostsData(res.data);
       })
       .catch((err) => {
-        console.error("Could not fetch posts. Please try again.");
+        alert("Could not fetch posts. Please try again.");
       });
   };
 
@@ -50,13 +49,13 @@ const FeedScreen = (props) => {
     } else {
       files = post.file;
     }
-    console.log("POST LIKES", post.likes);
     let hasUserLikedPost = post.likes.includes(auth.authData.userId)
       ? true
       : false;
 
     return (
       <Post
+        navigation={props.navigation}
         key={post._id}
         title={post.title}
         files={files}

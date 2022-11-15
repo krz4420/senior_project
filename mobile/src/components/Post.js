@@ -23,6 +23,7 @@ const Post = ({
   comments,
   id,
   hasUserLikedPost,
+  navigation,
 }) => {
   const [isLiked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
@@ -83,22 +84,24 @@ const Post = ({
       setLikeCount(totLikes + 1);
       likes += 1;
     }
-    console.log(likes);
 
     axios
       .post(`${BACKENDPOINT}/Post/like`, {
         postID: id,
         userID: auth.authData.userId,
       })
-      .then((data) => {
-        console.log(data);
-      });
-
-    // TODO call the backend and update the number of likes for this post
+      .catch(() => alert("Error has occured. Please try liking again!"));
   };
 
   const handleCommentPress = () => {
     // TODO navigate to comment section
+    navigation.navigate("Comment Section", {
+      comments,
+      id,
+      author,
+      timestamp,
+      description,
+    });
   };
 
   // Map over all the images/videos for the specific post and render them out

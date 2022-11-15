@@ -24,7 +24,6 @@ const LeaderBoardScreen = (props) => {
           return y.postCount - x.postCount;
         });
         // Update the state to reflect the sorted array of users from those with the largest post count to smallest
-        console.log(sortedData);
         totalUsers.map((user) => {
           console.log(user);
           if (
@@ -58,14 +57,11 @@ const LeaderBoardScreen = (props) => {
       case "All time":
         break;
       case "7 days":
-        // endDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        endDate = new Date(Date.now() - 30 * 60 * 1000);
+        endDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
         break;
       case "30 days":
-        endDate = new Date(Date.now() - 16 * 60 * 60 * 1000);
-
-        // endDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        endDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
         break;
     }
     fetchFeed(startDate, endDate);
