@@ -5,6 +5,9 @@ const router = Router();
 router.get("/", async (req: Request, res: Response) => {
   let userPostFrequency: any = {};
   let returnValue: any = [];
+  console.log(req.query.endDate);
+  console.log(req.query.startDate);
+
   // Create the query to perform on the database. If the endDate passed from the front end is "null"
   // Then the user selected the "All time" filter option and we do not care about querying based on timestamps
   const query =

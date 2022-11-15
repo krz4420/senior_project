@@ -124,9 +124,6 @@ router.get("/retrieve/post", async (req, res) => {
 
 router.post("/like", async (req, res) => {
   const { postID, userID } = req.body;
-
-  console.log(postID);
-  console.log(userID);
   try {
     const post = await Post.findById(postID);
 
@@ -142,6 +139,21 @@ router.post("/like", async (req, res) => {
   }
 });
 
-router.post("/comment", async (req, res) => {});
+router.post("/comment", async (req, res) => {
+  const { postID, username, body } = req.body;
+  console.log(body);
+  console.log(postID);
+  const allPosts = await Post.find();
+  console.log(allPosts);
+  try {
+    const data = { body, author: username, time: Date.now() };
+    await Post.findByIdAndUpdate(postID, {
+      $push: { comments: data },
+    });
+    res.status(200).json("Comment has been created");
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
 
 export default router;

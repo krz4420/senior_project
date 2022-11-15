@@ -12,7 +12,9 @@ const PostSchema = new mongoose.Schema(
     comments: [
       {
         body: String,
-        by: mongoose.Schema.Types.ObjectId,
+        author: String,
+        time: Date,
+        default: [],
       },
     ],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
