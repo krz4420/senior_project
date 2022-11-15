@@ -91,7 +91,7 @@ const CommentSection = (props) => {
   };
 
   return (
-    <View style={{ backgroundColor: "#F9FBFC" }}>
+    <View style={{ backgroundColor: "#F9FBFC", height: "100%" }}>
       <ScrollView
         style={{ marginTop: 60 + keyboardOffset, bottom: keyboardOffset + 60 }}
       >
