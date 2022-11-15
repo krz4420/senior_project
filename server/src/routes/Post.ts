@@ -27,6 +27,7 @@ conn.once("open", () => {
   gfs = Grid(conn.db, mongoose.mongo);
   gfs.collection("posts"); // Has to be the same as the bucketName
 });
+
 const handleVideoUpload = (file: any) => {
   console.log(file);
 };
@@ -121,8 +122,38 @@ router.get("/retrieve/post", async (req, res) => {
     });
 });
 
-router.post("/like", async (req, res) => {});
+router.post("/like", async (req, res) => {
+  const { postID, userID } = req.body;
+  try {
+    const post = await Post.findById(postID);
 
-router.post("/comment", async (req, res) => {});
+    if (!post.likes.includes(userID)) {
+      await post.updateOne({ $push: { likes: userID } });
+      res.status(200).json("Post has been liked");
+    } else {
+      await post.updateOne({ $pull: { likes: userID } });
+      res.status(200).json("Post has been disliked");
+    }
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
+router.post("/comment", async (req, res) => {
+  const { postID, username, body } = req.body;
+  console.log(body);
+  console.log(postID);
+  const allPosts = await Post.find();
+  console.log(allPosts);
+  try {
+    const data = { body, author: username, time: Date.now() };
+    await Post.findByIdAndUpdate(postID, {
+      $push: { comments: data },
+    });
+    res.status(200).json("Comment has been created");
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
 
 export default router;

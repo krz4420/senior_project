@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,9 +10,24 @@ import {
 import { BACKENDPOINT } from "../utils";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Video } from "expo-av";
+import axios from "axios";
+import { useAuth } from "../context/Auth";
 
-const Post = ({ title, description, author, timestamp, files }) => {
+const Post = ({
+  title,
+  description,
+  author,
+  timestamp,
+  files,
+  likes,
+  comments,
+  id,
+  hasUserLikedPost,
+  navigation,
+}) => {
   const [isLiked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(likes);
+  const auth = useAuth();
   const monthNames = [
     "Jan",
     "Feb",
@@ -53,13 +68,40 @@ const Post = ({ title, description, author, timestamp, files }) => {
     }
   };
 
-  const handleLikePress = () => {
-    setLiked(!isLiked);
-    // TODO call the backend and update the number of likes for this post
+  useEffect(() => {
+    hasUserLikedPost ? setLiked(true) : setLiked(false);
+    setLikeCount(likes);
+  }, [likes, hasUserLikedPost]);
+
+  const handleLikePress = (totalLikes) => {
+    let totLikes = totalLikes;
+    if (isLiked) {
+      setLiked(false);
+      setLikeCount(totLikes - 1);
+      likes -= 1;
+    } else {
+      setLiked(true);
+      setLikeCount(totLikes + 1);
+      likes += 1;
+    }
+
+    axios
+      .post(`${BACKENDPOINT}/Post/like`, {
+        postID: id,
+        userID: auth.authData.userId,
+      })
+      .catch(() => alert("Error has occured. Please try liking again!"));
   };
 
   const handleCommentPress = () => {
     // TODO navigate to comment section
+    navigation.navigate("Comment Section", {
+      comments,
+      id,
+      author,
+      timestamp,
+      description,
+    });
   };
 
   // Map over all the images/videos for the specific post and render them out
@@ -115,19 +157,26 @@ const Post = ({ title, description, author, timestamp, files }) => {
       {description ? <Text>{description}</Text> : null}
       <View style={styles.divider} />
       <View style={styles.interactionWrapper}>
-        <TouchableOpacity style={styles.likeWrapper} onPress={handleLikePress}>
+        <TouchableOpacity
+          style={styles.likeWrapper}
+          onPress={() => handleLikePress(likeCount)}
+        >
           <MaterialCommunityIcons
             name={isLiked ? "heart" : "heart-outline"}
             size="25"
           />
-          <Text style={{ marginTop: 3 }}>Like</Text>
+          <Text style={{ marginTop: 3 }}>
+            {likeCount == 1 ? `1 Like` : `${likeCount} Likes`}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.likeWrapper}
           onPress={handleCommentPress}
         >
           <MaterialCommunityIcons name={"chat-outline"} size="25" />
-          <Text style={{ marginTop: 3 }}>Comment</Text>
+          <Text style={{ marginTop: 3 }}>
+            {comments.length == 0 ? "Comment" : `${comments.length} Comments`}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

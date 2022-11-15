@@ -25,6 +25,7 @@ const JoinGroupScreen = ({ navigation }) => {
       .post(`${BACKENDPOINT}/Group/join`, {
         username: auth.authData.username,
         groupname: groupId,
+        userID: auth.authData.userId,
       })
       .then((res) => {
         auth.updateGroup(groupId, auth.authData);

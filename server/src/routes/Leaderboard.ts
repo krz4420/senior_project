@@ -1,9 +1,12 @@
 import { Request, Response, Router } from "express";
-import { Post } from "../models";
+import { Group, Post } from "../models";
 const router = Router();
 
 router.get("/", async (req: Request, res: Response) => {
   let userPostFrequency: any = {};
+  let returnValue: any = [];
+  console.log(req.query.endDate);
+  console.log(req.query.startDate);
 
   // Create the query to perform on the database. If the endDate passed from the front end is "null"
   // Then the user selected the "All time" filter option and we do not care about querying based on timestamps
@@ -18,7 +21,7 @@ router.get("/", async (req: Request, res: Response) => {
         }
       : { group: req.query.group };
 
-  Post.find(query)
+  await Post.find(query)
     .then((data: any) => {
       data.map((post: any) => {
         // If the user is already in the dictionary then update the post count
@@ -31,16 +34,26 @@ router.get("/", async (req: Request, res: Response) => {
       });
 
       //  Create an array to pass back to frontend consisting of key value pairs associated with username and postcount
-      let returnValue = [];
       for (const [key, value] of Object.entries(userPostFrequency)) {
         returnValue.push({ postCount: value, username: key });
       }
-      res.status(200).json(returnValue);
     })
     .catch((err) => {
       console.log(err);
       return res.status(400).json(err);
     });
+  let totalUsers: any = [];
+
+  await Group.findOne({ groupname: req.query.group })
+    .then((data) => {
+      totalUsers = data.members;
+    })
+    .catch((error) => {
+      return res.status(400).json(error);
+    });
+  console.log("Return", returnValue);
+  console.log("total", totalUsers);
+  res.status(200).json({ userPostCount: returnValue, totalUsers });
 });
 
 export default router;

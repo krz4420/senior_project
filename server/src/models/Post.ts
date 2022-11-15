@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import Group from "./Group";
-import User from "./User";
 
 const PostSchema = new mongoose.Schema(
   {
@@ -13,13 +11,13 @@ const PostSchema = new mongoose.Schema(
     description: String,
     comments: [
       {
-        type: String,
+        body: String,
+        author: String,
+        time: Date,
+        default: [],
       },
     ],
-    likes: {
-      type: "Number",
-      default: 0,
-    },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
     file: [
       {
         filename: String,
