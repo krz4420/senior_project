@@ -2,13 +2,9 @@ import React from "react";
 import FeedStack from "./FeedStack";
 import CreatePostScreen from "../screens/LandingPage/CreatePostScreen";
 import LeaderBoardScreen from "../screens/LandingPage/LeaderboardScreen";
-import ProfileScreen from "../screens/LandingPage/ProfileScreen";
-import {
-  getFocusedRouteNameFromRoute,
-  getStateFromPath,
-} from "@react-navigation/native";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import ProfileStack from "./ProfileStack";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -61,7 +57,7 @@ const TabNav = (props) => {
 
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStack}
         initialParams={{ groupName: props.route.name }}
         options={{
           tabBarLabel: "Profile",
