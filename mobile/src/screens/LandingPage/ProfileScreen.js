@@ -34,7 +34,7 @@ const ProfileScreen = (props) => {
     axios
       .post(`${BACKENDPOINT}/Profile`, data)
       .then(({ data }) => {
-        console.log(data);
+        console.log(`Profile screen`, data);
         setUsersLeaderboardPosition(data.leaderboardPosition);
         setUsersPosts(data.usersPost);
       })
@@ -43,13 +43,17 @@ const ProfileScreen = (props) => {
       });
   }, [isFocused]);
 
-  const handleOnPress = () => {
-    console.log("Hello");
+  const handleOnPress = (post) => {
+    console.log(post.file);
+    props.navigation.navigate("Post Section", {
+      title: post.title,
+      post: post,
+    });
   };
 
   const posts = usersPosts.map((post, index) => {
     return (
-      <Pressable key={index} onPress={handleOnPress}>
+      <Pressable key={index} onPress={() => handleOnPress(post)}>
         <View
           style={{
             width: width * 0.32,
