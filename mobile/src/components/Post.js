@@ -23,7 +23,7 @@ const Post = ({
   comments,
   id,
   hasUserLikedPost,
-  navigation,
+  handleCommentPress,
 }) => {
   const [isLiked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
@@ -93,16 +93,6 @@ const Post = ({
       .catch(() => alert("Error has occured. Please try liking again!"));
   };
 
-  const handleCommentPress = () => {
-    navigation.navigate("Comment Section", {
-      comments,
-      id,
-      author,
-      timestamp,
-      description,
-    });
-  };
-
   // Map over all the images/videos for the specific post and render them out
   const media = files.map(({ filename, filetype }, index) => {
     return (
@@ -170,11 +160,15 @@ const Post = ({
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.likeWrapper}
-          onPress={handleCommentPress}
+          onPress={() => handleCommentPress()}
         >
           <MaterialCommunityIcons name={"chat-outline"} size="25" />
           <Text style={{ marginTop: 3 }}>
-            {comments.length == 0 ? "Comment" : `${comments.length} Comments`}
+            {comments.length == 0
+              ? "Comment"
+              : comments.length == 1
+              ? "1 Comment"
+              : `${comments.length} Comments`}
           </Text>
         </TouchableOpacity>
       </View>
@@ -227,7 +221,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginVertical: 5,
+    marginTop: 3,
     alignContent: "center",
   },
   image: {

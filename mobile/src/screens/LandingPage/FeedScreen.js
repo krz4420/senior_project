@@ -53,9 +53,18 @@ const FeedScreen = (props) => {
       ? true
       : false;
 
+    const handleCommentPress = () => {
+      props.navigation.navigate("Comment Section", {
+        comments: post.comments,
+        id: post._id,
+        author: post.user,
+        timestamp: post.createdAt,
+        description: post.description ? post.description : null,
+      });
+    };
+
     return (
       <Post
-        navigation={props.navigation}
         key={post._id}
         title={post.title}
         files={files}
@@ -66,6 +75,7 @@ const FeedScreen = (props) => {
         comments={post.comments}
         id={post._id}
         hasUserLikedPost={hasUserLikedPost}
+        handleCommentPress={handleCommentPress}
       />
     );
   });

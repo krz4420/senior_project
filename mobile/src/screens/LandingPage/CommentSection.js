@@ -1,32 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  StyleSheet,
-  Keyboard,
-  TextInput,
-  Pressable,
-} from "react-native";
-import CustomInput from "../../components/CustomInput";
-import CustomButton from "../../components/CustomButton";
-import Comment from "../../components/Comment";
-
+import CommentSectionView from "../../components/CommentSectionView";
+import CommentInputBox from "../../components/CommentInputBox";
+import { useAuth } from "../../context/Auth";
 import axios from "axios";
 import { BACKENDPOINT } from "../../utils";
-import { useAuth } from "../../context/Auth";
+import { ScrollView, Keyboard } from "react-native";
 
 const CommentSection = (props) => {
+  const auth = useAuth();
   const [body, setBody] = useState("");
+
   const { comments, id, author, timestamp, description } = props.route.params;
   const [allComments, setAllComments] = useState(comments);
-
-  const auth = useAuth();
-
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+
   const onKeyboardShow = (event) =>
     setKeyboardOffset(event.endCoordinates.height);
   const onKeyboardHide = () => setKeyboardOffset(0);
+
   const keyboardDidShowListener = useRef();
   const keyboardDidHideListener = useRef();
 
@@ -45,24 +36,15 @@ const CommentSection = (props) => {
       keyboardDidHideListener.current.remove();
     };
   }, []);
-
-  const commentsView = allComments.map((comment, index) => {
-    return (
-      <View key={index}>
-        <Comment
-          author={comment.author}
-          body={comment.body}
-          time={comment.time}
-        />
-      </View>
-    );
-  });
-
-  const handleSubmitComment = async () => {
-    const data = { postID: id, username: auth.authData.username, body };
+  const handleSubmitComment = async (comment) => {
+    const data = {
+      postID: props.id,
+      username: auth.authData.username,
+      body: comment,
+    };
 
     // If the comment is nothing besides white space then alert the user
-    const noWhiteSpace = body.replace(/\s/g, "");
+    const noWhiteSpace = comment.replace(/\s/g, "");
     if (noWhiteSpace == "") {
       alert("Please enter a comment!");
       setBody("");
@@ -81,75 +63,39 @@ const CommentSection = (props) => {
           {
             author: auth.authData.username,
             time: Date.now(),
-            body,
+            body: comment,
           },
         ]);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log(error);
         alert("Error: Comment was not created");
       });
   };
 
   return (
-    <View style={{ backgroundColor: "#F9FBFC", height: "100%" }}>
+    <>
       <ScrollView
         style={{ marginTop: 60 + keyboardOffset, bottom: keyboardOffset + 60 }}
       >
-        <Comment author={author} time={timestamp} body={description} />
-        <View style={styles.divider} />
-        {commentsView}
-      </ScrollView>
-      <View style={[styles.commentContainer, { bottom: keyboardOffset }]}>
-        <TextInput
-          style={styles.commentBox}
-          onSubmitEditing={Keyboard.dismiss}
-          placeholder="Enter a comment..."
-          placeholderTextColor="#000"
-          keyboardType="default"
-          value={body}
-          onChangeText={setBody}
-          multiline
+        <CommentSectionView
+          comments={comments}
+          id={id}
+          author={author}
+          timestamp={timestamp}
+          description={description}
+          allComments={allComments}
         />
-        <View>
-          <Pressable style={styles.submitButton} onPress={handleSubmitComment}>
-            <Text style={styles.buttonText}>Post</Text>
-          </Pressable>
-        </View>
-      </View>
-    </View>
+      </ScrollView>
+
+      <CommentInputBox
+        handleSubmitComment={handleSubmitComment}
+        body={body}
+        setBody={setBody}
+        keyboardOffset={keyboardOffset}
+      />
+    </>
   );
 };
-
-const styles = StyleSheet.create({
-  commentContainer: {
-    position: "absolute",
-    width: "100%",
-    borderColor: "#dedede",
-    borderTopWidth: 1,
-    padding: 10,
-    backgroundColor: "#F9FBFC",
-    flexDirection: "row",
-  },
-  commentBox: {
-    fontSize: 16,
-    width: "80%",
-  },
-  submitButton: {
-    backgroundColor: "#dedede",
-    marginHorizontal: 5,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderRadius: 40,
-    borderColor: "#dedede",
-  },
-  divider: {
-    borderBottomColor: "#dddddd",
-    borderBottomWidth: 1,
-    width: "100%",
-    alignSelf: "center",
-    marginVertical: 5,
-  },
-});
 
 export default CommentSection;
