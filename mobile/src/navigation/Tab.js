@@ -62,6 +62,7 @@ const TabNav = (props) => {
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
+        initialParams={{ groupName: props.route.name }}
         options={{
           tabBarLabel: "Profile",
           tabBarIcon: ({ color }) => (

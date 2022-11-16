@@ -94,7 +94,6 @@ const Post = ({
   };
 
   const handleCommentPress = () => {
-    // TODO navigate to comment section
     navigation.navigate("Comment Section", {
       comments,
       id,

@@ -1,18 +1,148 @@
-import React from 'react'
-import { View, Text} from 'react-native'
-import CustomButton from '../../components/CustomButton';
-import { useAuth } from '../../context/Auth';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Button,
+  Pressable,
+  Image,
+} from "react-native";
+import { useAuth } from "../../context/Auth";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useIsFocused } from "@react-navigation/native";
+import axios from "axios";
+import { BACKENDPOINT } from "../../utils";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Dimensions } from "react-native";
 
+const ProfileScreen = (props) => {
+  const auth = useAuth();
+  const isFocused = useIsFocused();
+  const [usersPosts, setUsersPosts] = useState([]);
+  const [usersLeaderboardPosition, setUsersLeaderboardPosition] =
+    useState(null);
 
-const ProfileScreen = () => {
-    const auth = useAuth();
-    return(
-        <View>
-            <Text>{auth.authData.username}</Text>
-            <CustomButton text="Sign Out" onPress={auth.signOut}/>
+  const width = Dimensions.get("window").width;
+
+  useEffect(() => {
+    const data = {
+      groupname: props.route.params.groupName,
+      username: auth.authData.username,
+    };
+
+    axios
+      .post(`${BACKENDPOINT}/Profile`, data)
+      .then(({ data }) => {
+        console.log(data);
+        setUsersLeaderboardPosition(data.leaderboardPosition);
+        setUsersPosts(data.usersPost);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [isFocused]);
+
+  const handleOnPress = () => {
+    console.log("Hello");
+  };
+
+  const posts = usersPosts.map((post, index) => {
+    return (
+      <Pressable key={index} onPress={handleOnPress}>
+        <View
+          style={{
+            width: width * 0.32,
+            height: width * 0.32,
+            marginHorizontal: 2,
+          }}
+        >
+          <Image
+            style={{ flex: 1 }}
+            source={{
+              uri: `${BACKENDPOINT}/Post/retrieve/image?name=${post.file[0].filename}`,
+            }}
+          />
         </View>
-      
-    )
-}
+      </Pressable>
+    );
+  });
 
+  return (
+    <ScrollView>
+      <View style={{ marginTop: 10 }}>
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ flex: 1 }}>
+            <MaterialCommunityIcons
+              style={styles.avatar}
+              name={"account"}
+              size={100}
+            />
+            <Text style={{ textAlign: "center", fontWeight: "bold" }}>
+              {auth.authData.username}
+            </Text>
+          </View>
+          <View style={{ marginTop: 15, flex: 3 }}>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-around" }}
+            >
+              <View style={{ alignItems: "center" }}>
+                <Text>{usersPosts.length}</Text>
+                <Text style={{ fontSize: 11, color: "grey" }}>posts</Text>
+              </View>
+              <View style={{ alignItems: "center" }}>
+                <Text>{usersLeaderboardPosition}</Text>
+                <Text style={{ fontSize: 11, color: "grey" }}>
+                  Leaderboard Position
+                </Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Pressable style={styles.edit}>
+                <TouchableOpacity>
+                  <Text style={{ textAlign: "center" }}>Edit Profile</Text>
+                </TouchableOpacity>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View style={[styles.divider]} />
+      <View style={{ justifyContent: "center" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+          }}
+        >
+          {posts}
+        </View>
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  edit: {
+    borderColor: "#e0e0e0",
+    borderWidth: 1,
+    borderRadius: 10,
+    width: "95%",
+    height: 35,
+    justifyContent: "center",
+    marginTop: 15,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 25,
+  },
+  divider: {
+    marginVertical: 10,
+    borderBottomColor: "#e0e0e0",
+    borderBottomWidth: 1,
+    width: "100%",
+    alignSelf: "center",
+  },
+});
 export default ProfileScreen;
