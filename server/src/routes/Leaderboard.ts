@@ -42,6 +42,12 @@ router.get("/", async (req: Request, res: Response) => {
       console.log(err);
       return res.status(400).json(err);
     });
+
+  // Sort the return value from descending
+  returnValue.sort((x: any, y: any) => {
+    return y.postCount - x.postCount;
+  });
+
   let totalUsers: any = [];
 
   await Group.findOne({ groupname: req.query.group })
@@ -51,9 +57,19 @@ router.get("/", async (req: Request, res: Response) => {
     .catch((error) => {
       return res.status(400).json(error);
     });
+
+  // Update the state to reflect the sorted array of users from those with the largest post count to smallest
+  totalUsers.map((user: any) => {
+    console.log(user);
+    if (
+      !returnValue.some((userWhoPosted: any) => userWhoPosted.username == user)
+    ) {
+      returnValue.push({ postCount: 0, username: user });
+    }
+  });
+
   console.log("Return", returnValue);
-  console.log("total", totalUsers);
-  res.status(200).json({ userPostCount: returnValue, totalUsers });
+  res.status(200).json({ userPostCount: returnValue });
 });
 
 export default router;

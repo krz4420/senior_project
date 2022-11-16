@@ -16,24 +16,10 @@ const LeaderBoardScreen = (props) => {
       )
       // Data that we are handed back is an array of key value pairs in the form of username and postCount
       .then(({ data }) => {
-        const { userPostCount, totalUsers } = data;
+        const { userPostCount } = data;
         console.log(userPostCount);
-        console.log(totalUsers);
-        // Sort the array by the postCount for each user
-        const sortedData = userPostCount.sort((x, y) => {
-          return y.postCount - x.postCount;
-        });
-        // Update the state to reflect the sorted array of users from those with the largest post count to smallest
-        totalUsers.map((user) => {
-          console.log(user);
-          if (
-            !sortedData.some((userWhoPosted) => userWhoPosted.username == user)
-          ) {
-            sortedData.push({ postCount: 0, username: user });
-          }
-        });
 
-        setUsers(sortedData);
+        setUsers(userPostCount);
       })
       .catch((err) => {
         console.error(err);
