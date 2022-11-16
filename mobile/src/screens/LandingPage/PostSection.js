@@ -17,14 +17,10 @@ const PostSection = (props) => {
   const { _id, comments, likes, file, createdAt, description, user, title } =
     props.route.params.post;
   const userLikedPost = likes.includes(auth.authData.userId) ? true : false;
-  const width = Dimensions.get("window").width;
-  const height = Dimensions.get("window").height;
+
   const [allComments, setAllComments] = useState(comments);
   const [body, setBody] = useState("");
 
-  const handleSubmitComment = () => {
-    console.log("Hello");
-  };
   const handleCommentPress = () => {
     console.log("Hello");
   };
@@ -86,10 +82,12 @@ const PostSection = (props) => {
         </View>
       </ScrollView>
       <CommentInputBox
-        handleSubmitComment={handleSubmitComment}
+        id={_id}
         body={body}
         setBody={setBody}
         keyboardOffset={keyboardOffset}
+        setAllComments={setAllComments}
+        allComments={allComments}
       />
     </>
   );

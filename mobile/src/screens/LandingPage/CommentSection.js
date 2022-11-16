@@ -36,42 +36,6 @@ const CommentSection = (props) => {
       keyboardDidHideListener.current.remove();
     };
   }, []);
-  const handleSubmitComment = async (comment) => {
-    const data = {
-      postID: props.id,
-      username: auth.authData.username,
-      body: comment,
-    };
-
-    // If the comment is nothing besides white space then alert the user
-    const noWhiteSpace = comment.replace(/\s/g, "");
-    if (noWhiteSpace == "") {
-      alert("Please enter a comment!");
-      setBody("");
-      return;
-    }
-
-    // Post comment to the backend to be uploaded
-    await axios
-      .post(`${BACKENDPOINT}/Post/comment`, data)
-      .then((data) => {
-        alert("Comment created successfully!");
-        setBody("");
-        // Add the new comment to the state variable for real time update to the user's feed
-        setAllComments([
-          ...allComments,
-          {
-            author: auth.authData.username,
-            time: Date.now(),
-            body: comment,
-          },
-        ]);
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("Error: Comment was not created");
-      });
-  };
 
   return (
     <>
@@ -89,10 +53,12 @@ const CommentSection = (props) => {
       </ScrollView>
 
       <CommentInputBox
-        handleSubmitComment={handleSubmitComment}
+        id={id}
         body={body}
         setBody={setBody}
         keyboardOffset={keyboardOffset}
+        allComments={allComments}
+        setAllComments={setAllComments}
       />
     </>
   );
