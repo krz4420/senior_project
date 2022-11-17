@@ -1,7 +1,12 @@
 import { useIsFocused } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { ScrollView, RefreshControl, SafeAreaView } from "react-native";
+import {
+  ScrollView,
+  RefreshControl,
+  SafeAreaView,
+  Pressable,
+} from "react-native";
 import { BACKENDPOINT } from "../../utils";
 import Post from "../../components/Post";
 import { useAuth } from "../../context/Auth";
@@ -53,20 +58,39 @@ const FeedScreen = (props) => {
       ? true
       : false;
 
+    const handleCommentPress = () => {
+      props.navigation.navigate("Comment Section", {
+        comments: post.comments,
+        id: post._id,
+        author: post.user,
+        timestamp: post.createdAt,
+        description: post.description ? post.description : null,
+      });
+    };
+
     return (
-      <Post
-        navigation={props.navigation}
+      <Pressable
+        onPress={() => {
+          props.navigation.navigate("Post Section", {
+            post: post,
+            title: post.title,
+          });
+        }}
         key={post._id}
-        title={post.title}
-        files={files}
-        author={post.user}
-        timestamp={post.createdAt}
-        description={post.description ? post.description : null}
-        likes={post.likes.length}
-        comments={post.comments}
-        id={post._id}
-        hasUserLikedPost={hasUserLikedPost}
-      />
+      >
+        <Post
+          title={post.title}
+          files={files}
+          author={post.user}
+          timestamp={post.createdAt}
+          description={post.description ? post.description : null}
+          likes={post.likes.length}
+          comments={post.comments}
+          id={post._id}
+          hasUserLikedPost={hasUserLikedPost}
+          handleCommentPress={handleCommentPress}
+        />
+      </Pressable>
     );
   });
 

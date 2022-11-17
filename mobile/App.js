@@ -1,6 +1,6 @@
-import { StyleSheet, SafeAreaView } from 'react-native';
-import Navigation from './src/navigation';
-import { AuthProvider } from './src/context/Auth';
+import { StyleSheet, SafeAreaView } from "react-native";
+import Navigation from "./src/navigation";
+import { AuthProvider } from "./src/context/Auth";
 
 export default function App() {
   return (
@@ -15,7 +15,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FBFC',
-    
+    backgroundColor: "#F9FBFC",
   },
 });
