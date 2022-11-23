@@ -5,9 +5,7 @@ const router = Router();
 router.get("/", async (req: Request, res: Response) => {
   let userPostFrequency: any = {};
   let returnValue: any = [];
-  console.log(req.query.endDate);
-  console.log(req.query.startDate);
-  console.log(req.query.group);
+
   // Create the query to perform on the database. If the endDate passed from the front end is "null"
   // Then the user selected the "All time" filter option and we do not care about querying based on timestamps
   const query =
@@ -49,9 +47,8 @@ router.get("/", async (req: Request, res: Response) => {
   });
 
   let totalUsers: any = [];
-
-  await Group.findOne({ groupname: req.query.group })
-    .then((data) => {
+  await Group.findOne({ name: req.query.group })
+    .then((data: any) => {
       totalUsers = data.members;
     })
     .catch((error) => {
@@ -60,7 +57,6 @@ router.get("/", async (req: Request, res: Response) => {
 
   // Update the state to reflect the sorted array of users from those with the largest post count to smallest
   totalUsers.map((user: any) => {
-    console.log(user);
     if (
       !returnValue.some((userWhoPosted: any) => userWhoPosted.username == user)
     ) {
@@ -68,7 +64,6 @@ router.get("/", async (req: Request, res: Response) => {
     }
   });
 
-  console.log("Return", returnValue);
   res.status(200).json({ userPostCount: returnValue });
 });
 
