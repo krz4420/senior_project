@@ -6,8 +6,10 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Pressable,
+  Alert,
 } from "react-native";
-import { BACKENDPOINT } from "../utils";
+import { BACKENDPOINT, calculateTimeDifference } from "../utils";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Video } from "expo-av";
 import axios from "axios";
@@ -24,49 +26,11 @@ const Post = ({
   id,
   hasUserLikedPost,
   handleCommentPress,
+  handlePostNavigation,
 }) => {
   const [isLiked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
   const auth = useAuth();
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
-  const calculateTimeDifference = () => {
-    const postedTime = new Date(timestamp);
-    const currTime = Date.now();
-    const differenceMilliseconds = currTime - postedTime;
-    const diffMinutes = Math.ceil(differenceMilliseconds / (1000 * 60));
-    const diffHours = Math.ceil(differenceMilliseconds / (1000 * 3600));
-    const diffDays = Math.ceil(diffHours / 24);
-
-    if (diffMinutes <= 59) {
-      return diffMinutes == 1
-        ? `${diffMinutes} Minute ago`
-        : `${diffMinutes} Minutes ago`;
-    } else if (diffHours <= 24) {
-      return diffHours == 1
-        ? `${diffHours} Hour ago`
-        : `${diffHours} Hours ago`;
-    } else if (diffDays <= 7) {
-      return diffDays == 1 ? `${diffDays} Day ago` : `${diffDays} Days ago`;
-    } else {
-      return `${
-        monthNames[postedTime.getMonth()]
-      } ${postedTime.getDate()}, ${postedTime.getFullYear()}`;
-    }
-  };
 
   useEffect(() => {
     hasUserLikedPost ? setLiked(true) : setLiked(false);
@@ -90,51 +54,66 @@ const Post = ({
         postID: id,
         userID: auth.authData.userId,
       })
-      .catch(() => alert("Error has occured. Please try liking again!"));
+      .catch(() =>
+        Alert.alert("An Error has occured", "Please try liking again!")
+      );
   };
 
   // Map over all the images/videos for the specific post and render them out
   const media = files.map(({ filename, filetype }, index) => {
     return (
       <View key={index}>
-        {filename &&
-        (filetype.includes("image") ||
-          filetype.includes("jpg") ||
-          filetype.includes("jpeg")) ? (
-          <Image
-            style={styles.image}
-            source={{
-              uri: `${BACKENDPOINT}/Post/retrieve/image?name=${filename}`,
-            }}
-          />
-        ) : null}
-        {filename && filetype.includes("video") ? (
-          <Video
-            style={styles.image}
-            source={{
-              uri: `${BACKENDPOINT}/Post/retrieve/video?name=${filename}`,
-            }}
-          />
-        ) : null}
+        <Pressable onPress={handlePostNavigation}>
+          {filename &&
+          filetype &&
+          (filetype.includes("image") ||
+            filetype.includes("jpg") ||
+            filetype.includes("jpeg")) ? (
+            <Image
+              style={styles.image}
+              source={{
+                uri: `${BACKENDPOINT}/Post/retrieve/image?name=${filename}`,
+              }}
+            />
+          ) : null}
+          {filename && filetype && filetype.includes("video") ? (
+            <Video
+              useNativeControls
+              style={styles.image}
+              source={
+                {
+                  // uri: `${BACKENDPOINT}/Post/retrieve/video?name=${filename}`,
+                  // uri: `http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4`,
+                  // uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+                  // uri: require("../utils/video2.mp4"),
+                }
+              }
+              onError={(error) => console.error(error)}
+              onReadyForDisplay={(data) => console.error(data)}
+            />
+          ) : null}
+        </Pressable>
       </View>
     );
   });
 
   return (
     <View style={styles.container}>
-      <View style={styles.userInfo}>
-        <MaterialCommunityIcons
-          style={styles.avatar}
-          name={"account"}
-          size={50}
-        />
-        <View style={styles.textInfo}>
-          <Text style={{ fontSize: 14, fontWeight: "bold" }}>{author}</Text>
-          <Text style={{ fontSize: 12, color: "#666" }}>
-            {calculateTimeDifference()}
-          </Text>
+      <Pressable onPress={handlePostNavigation}>
+        <View style={styles.userInfo}>
+          <MaterialCommunityIcons
+            style={styles.avatar}
+            name={"account"}
+            size={50}
+          />
+          <View style={styles.textInfo}>
+            <Text style={{ fontSize: 14, fontWeight: "bold" }}>{author}</Text>
+            <Text style={{ fontSize: 12, color: "#666" }}>
+              {calculateTimeDifference(timestamp)}
+            </Text>
+          </View>
         </View>
-      </View>
+      </Pressable>
       <ScrollView
         horizontal={true}
         contentContainerStyle={styles.imageContainer}
@@ -142,9 +121,11 @@ const Post = ({
       >
         {media}
       </ScrollView>
-      <Text style={{ fontSize: 14, fontWeight: "bold" }}>{title}</Text>
-      {description ? <Text>{description}</Text> : null}
-      <View style={styles.divider} />
+      <Pressable onPress={handlePostNavigation}>
+        <Text style={{ fontSize: 14, fontWeight: "bold" }}>{title}</Text>
+        {description ? <Text>{description}</Text> : null}
+        <View style={styles.divider} />
+      </Pressable>
       <View style={styles.interactionWrapper}>
         <TouchableOpacity
           style={styles.likeWrapper}

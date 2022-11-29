@@ -1,12 +1,7 @@
 import { useIsFocused } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import {
-  ScrollView,
-  RefreshControl,
-  SafeAreaView,
-  Pressable,
-} from "react-native";
+import { ScrollView, RefreshControl, SafeAreaView } from "react-native";
 import { BACKENDPOINT } from "../../utils";
 import Post from "../../components/Post";
 import { useAuth } from "../../context/Auth";
@@ -16,10 +11,10 @@ const wait = (timeout) => {
 };
 
 const FeedScreen = (props) => {
-  const [postsData, setPostsData] = useState([]);
-  const isFocused = useIsFocused();
   const auth = useAuth();
+  const isFocused = useIsFocused();
 
+  const [postsData, setPostsData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
   // Handles Refreshes and waits for the fetchFeed call to finish then waits another second to switch refreshing off for the UX.
@@ -68,29 +63,28 @@ const FeedScreen = (props) => {
       });
     };
 
+    const handlePostNavigation = () => {
+      props.navigation.navigate("Post Section", {
+        post: post,
+        title: post.title,
+      });
+    };
+
     return (
-      <Pressable
-        onPress={() => {
-          props.navigation.navigate("Post Section", {
-            post: post,
-            title: post.title,
-          });
-        }}
+      <Post
         key={post._id}
-      >
-        <Post
-          title={post.title}
-          files={files}
-          author={post.user}
-          timestamp={post.createdAt}
-          description={post.description ? post.description : null}
-          likes={post.likes.length}
-          comments={post.comments}
-          id={post._id}
-          hasUserLikedPost={hasUserLikedPost}
-          handleCommentPress={handleCommentPress}
-        />
-      </Pressable>
+        title={post.title}
+        files={files}
+        author={post.user}
+        timestamp={post.createdAt}
+        description={post.description ? post.description : null}
+        likes={post.likes.length}
+        comments={post.comments}
+        id={post._id}
+        hasUserLikedPost={hasUserLikedPost}
+        handleCommentPress={handleCommentPress}
+        handlePostNavigation={handlePostNavigation}
+      />
     );
   });
 
