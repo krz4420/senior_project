@@ -218,20 +218,43 @@ router.get("/retrieve/video", async (req, res) => {
   }
 });
 
-router.get("/retrieve/post", async (req, res) => {
-  const group = req.query.group;
-  Post.find({ group: group })
+router.post("/retrieve/post", async (req, res) => {
+  const { group, limit, lastPost } = req.body;
+  console.log("Last Post", typeof lastPost);
+  console.log("Group", group);
+  const query =
+    lastPost != null
+      ? {
+          group: group,
+          createdAt: {
+            $lt: lastPost,
+          },
+        }
+      : { group: group };
+  await Post.find(query)
+    .sort({ createdAt: -1 })
+    .limit(limit)
     .then((data) => {
-      data.sort((x, y) => {
-        return y.createdAt - x.createdAt;
-      });
-
-      return res.status(200).send(data);
+      console.log(data);
+      return res.status(200).json(data);
     })
     .catch((err) => {
       console.log(err);
       return res.status(400).json(err);
     });
+
+  // Post.find({ group: group })
+  //   .then((data) => {
+  //     data.sort((x, y) => {
+  //       return y.createdAt - x.createdAt;
+  //     });
+
+  //     return res.status(200).send(data);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //     return res.status(400).json(err);
+  //   });
 });
 
 router.post("/like", async (req, res) => {
@@ -255,8 +278,7 @@ router.post("/comment", async (req, res) => {
   const { postID, username, body } = req.body;
   console.log(body);
   console.log(postID);
-  const allPosts = await Post.find();
-  console.log(allPosts);
+
   try {
     const data = { body, author: username, time: Date.now() };
     await Post.findByIdAndUpdate(postID, {
