@@ -37,3 +37,7 @@ export const calculateTimeDifference = (timestamp) => {
     } ${postedTime.getDate()}, ${postedTime.getFullYear()}`;
   }
 };
+
+export const wait = (timeout) => {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+};
