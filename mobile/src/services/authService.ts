@@ -11,8 +11,8 @@ export type AuthData = {
 
 const signIn = async (userInfo): Promise<AuthData> => {
   console.log("Sign in");
-  const promise: AuthData = await new Promise((resolve, reject) => {
-    axios
+  const promise: AuthData = await new Promise(async (resolve, reject) => {
+    await axios
       .post(`${BACKENDPOINT}/LogIn`, userInfo)
       .then((res) => {
         console.log("RESULT", res.data.userID);
@@ -25,8 +25,7 @@ const signIn = async (userInfo): Promise<AuthData> => {
         };
         resolve(data);
       })
-      .catch((error) => {
-        console.log("Error in auth service sign in");
+      .catch(() => {
         reject(Error("Incorrect Credentials"));
       });
   });

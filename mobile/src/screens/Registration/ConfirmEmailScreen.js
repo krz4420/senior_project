@@ -4,6 +4,7 @@ import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 
+// Skeleton of confirm email when user signs up. Component is not used at the momemnt.
 const ConfirmEmailScreen = () => {
   const [code, setCode] = useState("");
   const [email, setEmail] = useState("");

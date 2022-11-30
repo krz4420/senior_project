@@ -54,7 +54,7 @@ const SignUpScreen = () => {
   };
 
   // Handles when user clicks sign up.
-  const onSignUpPressed = () => {
+  const onSignUpPressed = async () => {
     setValidForm((prevState) => ({ ...prevState, usernameNotTaken: true }));
     setValidForm((prevState) => ({ ...prevState, emailNotTaken: true }));
     // If the information the user inputted is valid, then check to see if username and email are not used already.
@@ -63,15 +63,14 @@ const SignUpScreen = () => {
       const userInfo = { username, email, password };
 
       // Ping backend to see if the username or email is already taken
-      axios
+      await axios
         .post(`${BACKENDPOINT}/SignUp`, userInfo)
-        .then((res) => {
+        .then(() => {
           navigation.navigate("Log In");
         })
         .catch((err) => {
-          console.warn("ERROR");
+          console.error(error);
           error = err.response.data.message;
-          console.log(error);
 
           if (error == "Username and Email Taken!") {
             setValidForm((prevState) => ({

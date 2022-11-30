@@ -8,6 +8,7 @@ import ProfileStack from "./ProfileStack";
 
 const Tab = createMaterialBottomTabNavigator();
 
+// Tab navigator to display the tabs at the bottom of the screen
 const TabNav = (props) => {
   return (
     <Tab.Navigator

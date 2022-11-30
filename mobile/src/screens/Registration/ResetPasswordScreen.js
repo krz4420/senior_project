@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, View, Text, Image, StyleSheet } from "react-native";
+import { ScrollView, View, Text, Image, StyleSheet, Alert } from "react-native";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
@@ -16,16 +16,24 @@ const ResetPasswordScreen = ({ route }) => {
 
   useEffect(() => {
     const { email } = route.params;
-    axios
-      .post(`${BACKENDPOINT}/ResetPassword/generateCode`, { email })
-      .catch((err) => {
-        error = error.response.data.message;
-        setValidForm(false);
-      });
+    const generateCode = async () => {
+      axios
+        .post(`${BACKENDPOINT}/ResetPassword/generateCode`, { email })
+        .catch((err) => {
+          console.error(err);
+          setValidForm(false);
+          Alert.alert(
+            "Error",
+            "Code could not be send to email. Double check the username."
+          );
+        });
+    };
+
+    // Ping the backendpoint to generate a random code and email it to email on user's account
+    generateCode();
   }, []);
 
-  const onResetPasswordPressed = () => {
-    console.warn("reset");
+  const onResetPasswordPressed = async () => {
     if (password.length < 4) {
       setValidPass(false);
       console.log("Error with password");
@@ -33,7 +41,7 @@ const ResetPasswordScreen = ({ route }) => {
     }
 
     const { username, email } = route.params;
-    axios
+    await axios
       .post(`${BACKENDPOINT}/ResetPassword/confirmReset`, {
         code,
         password,
@@ -54,7 +62,7 @@ const ResetPasswordScreen = ({ route }) => {
       });
   };
 
-  const onLogIn = () => {
+  const onLogInPressed = () => {
     navigation.navigate("Log In");
   };
 
@@ -95,7 +103,7 @@ const ResetPasswordScreen = ({ route }) => {
 
         <CustomButton
           text="Back to Sign In"
-          onPress={onLogIn}
+          onPress={onLogInPressed}
           type="TERTIARY"
         />
       </View>

@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Stack = createNativeStackNavigator();
 
+// Stack navigator combining the tab and drawer navigators for the landing page of the app
 const HomeScreen = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

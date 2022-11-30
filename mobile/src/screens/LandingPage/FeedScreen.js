@@ -24,7 +24,7 @@ const FeedScreen = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [fetchedAllPosts, setFetchedAllPosts] = useState(false);
 
-  // Handles Refreshes and waits for the fetchFeed call to finish then waits another second to switch refreshing off for the UX.
+  // Handles Refreshes and waits for the fetchFeed call to finish then waits another second to switch refreshing off for a better UX.
   const onRefresh = useCallback(() => {
     setIsLoading(true);
     fetchFeed().then(wait(1000).then(() => setIsLoading(false)));

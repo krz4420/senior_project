@@ -6,6 +6,7 @@ import PostSection from "../screens/LandingPage/PostSection";
 
 const Stack = createNativeStackNavigator();
 
+// Navigation stack for the feed screen of the homepage
 const FeedStack = (props) => {
   const groupName = props.route.params.groupName;
   return (

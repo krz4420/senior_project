@@ -17,8 +17,7 @@ type AuthContextData = {
   updateGroup(groupname: string, auth_data: AuthData): Promise<void>;
 };
 
-//Create the Auth Context with the data type specified
-//and a empty object
+// Create the Auth Context with the data type specified and a empty object
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 interface Props {
@@ -27,8 +26,7 @@ interface Props {
 const AuthProvider: React.FC<Props> = ({ children }) => {
   const [authData, setAuthData] = useState<AuthData>();
 
-  //the AuthContext start with loading equals true
-  //and stay like this, until the data be load from Async Storage
+  // The AuthContext start with loading equals true and stay like this, until the data be load from Async Storage
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,16 +37,14 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
 
   async function loadStorageData(): Promise<void> {
     try {
-      //Try get the data from Async Storage
+      // Try get the data from Async Storage
       const authDataSerialized = await AsyncStorage.getItem("@AuthData");
       if (authDataSerialized) {
-        //If there are data, it's converted to an Object and the state is updated.
         const _authData: AuthData = JSON.parse(authDataSerialized);
         setAuthData(_authData);
       }
     } catch (error) {
     } finally {
-      //loading finished
       setLoading(false);
     }
   }
@@ -57,11 +53,10 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
     try {
       const _authData = await authService.signIn(userInfo);
       console.log(_authData.userId);
-      //Set the data in the context, so the App can be notified
-      //and send the user to the AuthStack
+      // Set the data in the context
       setAuthData(_authData);
 
-      //Persist the data in the Async Storage
+      // Persist the data in the Async Storage
       AsyncStorage.setItem("@AuthData", JSON.stringify(_authData));
     } catch (error) {
       throw error;
@@ -70,13 +65,14 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
 
   const updateGroup = async (groupname: string, authData: AuthData) => {
     try {
+      // Update groups for the user
       const groups = authData.groups;
       groups.push(groupname);
-      //Set the data in the context, so the App can be notified
-      //and send the user to the AuthStack
+
+      //Set the data in the context
       setAuthData(authData);
 
-      //Persist the data in the Async Storage
+      // Persist the data in the Async Storage
       AsyncStorage.setItem("@AuthData", JSON.stringify(authData));
     } catch (error) {
       throw error;
@@ -84,18 +80,15 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   };
 
   const signOut = async () => {
-    //Remove data from context, so the App can be notified
-    //and send the user to the AuthStack
+    // Remove data from context
     setAuthData(undefined);
 
-    //Remove the data from Async Storage
-    //to NOT be recoverede in next session.
+    // Remove the data from Async Storage
     await AsyncStorage.removeItem("@AuthData");
   };
 
   return (
-    //This component will be used to encapsulate the whole App,
-    //so all components will have access to the Context
+    // This component will be used to encapsulate the whole App,
     <AuthContext.Provider
       value={{ authData, loading, signIn, signOut, updateGroup }}
     >
@@ -104,8 +97,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   );
 };
 
-//A simple hooks to facilitate the access to the AuthContext
-// and permit components to subscribe to AuthContext updates
+// A simple hooks to facilitate the access to the AuthContext and permit components to subscribe to AuthContext updates
 function useAuth(): AuthContextData {
   const context = useContext(AuthContext);
 

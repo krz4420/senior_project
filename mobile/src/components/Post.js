@@ -9,11 +9,13 @@ import {
   Pressable,
   Alert,
 } from "react-native";
+
 import { BACKENDPOINT, calculateTimeDifference } from "../utils";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Video } from "expo-av";
-import axios from "axios";
 import { useAuth } from "../context/Auth";
+
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import axios from "axios";
 
 const Post = ({
   title,
@@ -37,7 +39,7 @@ const Post = ({
     setLikeCount(likes);
   }, [likes, hasUserLikedPost]);
 
-  const handleLikePress = (totalLikes) => {
+  const handleLikePress = async (totalLikes) => {
     let totLikes = totalLikes;
     if (isLiked) {
       setLiked(false);
@@ -49,7 +51,7 @@ const Post = ({
       likes += 1;
     }
 
-    axios
+    await axios
       .post(`${BACKENDPOINT}/Post/like`, {
         postID: id,
         userID: auth.authData.userId,

@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import CommentSectionView from "../../components/CommentSectionView";
-import CommentInputBox from "../../components/CommentInputBox";
-import { useAuth } from "../../context/Auth";
-import axios from "axios";
-import { BACKENDPOINT } from "../../utils";
 import { ScrollView, Keyboard } from "react-native";
 
+import CommentSectionView from "../../components/CommentSectionView";
+import CommentInputBox from "../../components/CommentInputBox";
+
 const CommentSection = (props) => {
-  const auth = useAuth();
   const [body, setBody] = useState("");
 
   const { comments, id, author, timestamp, description } = props.route.params;

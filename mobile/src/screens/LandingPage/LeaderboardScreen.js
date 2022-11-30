@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { View, StyleSheet, Text, ScrollView, Pressable } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  Pressable,
+  Alert,
+} from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import axios from "axios";
 import { BACKENDPOINT } from "../../utils";
@@ -9,8 +16,10 @@ const LeaderBoardScreen = (props) => {
   const isFocused = useIsFocused();
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("All time");
-  const fetchFeed = (startDate, endDate) => {
-    axios
+
+  // Fetches the leaderboard data
+  const fetchFeed = async (startDate, endDate) => {
+    await axios
       .get(
         `${BACKENDPOINT}/Leaderboard?group=${props.route.params.groupName}&startDate=${startDate}&endDate=${endDate}`
       )
@@ -23,6 +32,7 @@ const LeaderBoardScreen = (props) => {
       })
       .catch((err) => {
         console.error(err);
+        Alert.alert("Error", "Unable to fetch Leaderboard Data!");
       });
   };
 
@@ -54,6 +64,7 @@ const LeaderBoardScreen = (props) => {
     setFilter(range);
   };
 
+  // Render the table with users ranked in order from most posts to least
   const membersRanked = users.map((user, index) => {
     return (
       <View key={index}>
