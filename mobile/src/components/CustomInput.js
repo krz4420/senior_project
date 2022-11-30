@@ -12,6 +12,7 @@ const CustomInput = ({
   onPressOut,
   onFocus,
   multiline,
+  disabled,
 }) => {
   return (
     <View style={styles.container}>
@@ -27,6 +28,7 @@ const CustomInput = ({
         onPressOut={onPressOut}
         onFocus={onFocus}
         multiline={multiline}
+        disabled={disabled}
       />
     </View>
   );
