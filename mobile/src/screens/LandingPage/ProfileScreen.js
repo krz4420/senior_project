@@ -15,6 +15,7 @@ import axios from "axios";
 import { BACKENDPOINT } from "../../utils";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Dimensions } from "react-native";
+import image from "../../../assets/image.jpeg";
 
 const ProfileScreen = (props) => {
   const auth = useAuth();
@@ -52,6 +53,15 @@ const ProfileScreen = (props) => {
   };
 
   const posts = usersPosts.map((post, index) => {
+    const uri =
+      post.file &&
+      post.file[0] &&
+      post.file[0].filetype &&
+      post.file[0].filename &&
+      !post.file[0].filetype.includes("video")
+        ? `${BACKENDPOINT}/Post/retrieve/image?name=${post.file[0].filename}`
+        : image;
+
     return (
       <Pressable key={index} onPress={() => handleOnPress(post)}>
         <View
@@ -61,12 +71,19 @@ const ProfileScreen = (props) => {
             marginHorizontal: 2,
           }}
         >
-          <Image
-            style={{ flex: 1 }}
-            source={{
-              uri: `${BACKENDPOINT}/Post/retrieve/image?name=${post.file[0].filename}`,
-            }}
-          />
+          {uri == image ? (
+            <Image
+              style={{ flex: 1, width: width * 0.32, height: width * 0.32 }}
+              source={image}
+            />
+          ) : (
+            <Image
+              style={{ flex: 1 }}
+              source={{
+                uri: uri,
+              }}
+            />
+          )}
         </View>
       </Pressable>
     );
