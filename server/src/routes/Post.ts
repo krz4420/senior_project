@@ -12,6 +12,7 @@ const hbjs = require("handbrake-js");
 var fs = require("fs");
 
 const router = Router();
+const mime = require("mime");
 
 const mongoUri =
   process.env.MONGO_URI ||
@@ -42,7 +43,7 @@ const handleVideoConvert = (filePath: any, filename: any) => {
   const options = {
     input: filePath,
     output: output,
-    preset: "Very Fast 480p30",
+    preset: "Fast 720p30",
   };
 
   return hbjs.spawn(options);
@@ -150,7 +151,7 @@ router.post(
               const writeStream = gridfsbucket.openUploadStream(
                 promise.filename
               );
-
+              console.log(mime.getType(promise.path));
               // Create the read stream taking input from video and pipe it to monogDB
               fs.createReadStream(promise.path).pipe(writeStream);
 
@@ -210,17 +211,10 @@ router.get("/retrieve/image", async (req, res) => {
 router.get("/retrieve/video", async (req, res) => {
   console.warn("IN RETRIEVE VIDEO");
   const result = await gfs.files.findOne({ filename: req.query.name });
-  console.log(result);
   if (result != null) {
     const readStream = gridfsbucket.openDownloadStream(result._id);
 
-    readStream.on("data", (chunk: any) => {
-      res.write(chunk);
-    });
-
-    readStream.on("end", () => {
-      res.end();
-    });
+    readStream.pipe(res);
   }
 });
 
