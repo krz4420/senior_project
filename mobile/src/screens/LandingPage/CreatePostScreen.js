@@ -40,12 +40,11 @@ const CreatePostScreen = (props) => {
       aspect: [4, 3],
       quality: 1,
     });
-    console.log(result.uri.split("."));
 
     if (!result.cancelled) {
       setMedia([
         ...media,
-        { uri: result.uri, type: result.type, name: result.uri.split(".")[1] },
+        { uri: result.uri, type: result.type, name: result.fileName },
       ]);
     }
   };
@@ -83,7 +82,6 @@ const CreatePostScreen = (props) => {
 
     let fileData = [];
     if (hasImage) {
-      console.log("FINNA FETcH FOR IMAGE");
       await axios
         .post(`${BACKENDPOINT}/Post/create/image`, imageBodyData, {
           headers: {
@@ -106,7 +104,6 @@ const CreatePostScreen = (props) => {
     console.log(fileData);
 
     if (hasVideo) {
-      console.log("FINNA FETcH FOR VIDEO");
       await axios
         .post(`${BACKENDPOINT}/Post/create/video`, videoBodyData, {
           headers: {

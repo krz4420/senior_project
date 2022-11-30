@@ -54,7 +54,7 @@ const imageStorage = new GridFsStorage({
   file: (req: any, file: any) => {
     console.log("File", file);
     return new Promise((resolve, reject) => {
-      let ext = path.extname(file.mimetype.split("/")[1]);
+      let ext = file.mimetype.split("/")[1];
       const filename = `post-${Date.now()}.${ext}`;
 
       const fileInfo = {
