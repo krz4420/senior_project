@@ -36,7 +36,6 @@ const FeedScreen = (props) => {
     if (fetchedAllPosts) return;
 
     setIsLoading(true);
-
     // Data that will be sent to the backend.
     const data = {
       group: props.route.params.groupName,
