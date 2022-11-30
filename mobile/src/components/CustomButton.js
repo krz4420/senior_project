@@ -7,14 +7,17 @@ const CustomButton = ({
   type = "PRIMARY",
   bgColor,
   fgColor,
+  disabled,
 }) => {
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled}
       style={[
         styles.container,
         styles[`container_${type}`],
         bgColor ? { backgroundColor: bgColor } : {},
+        disabled ? { backgroundColor: "#EBEBE4" } : {},
       ]}
     >
       <Text
@@ -22,6 +25,7 @@ const CustomButton = ({
           styles.text,
           styles[`text_${type}`],
           fgColor ? { color: fgColor } : {},
+          disabled ? { color: "#C6C6C6" } : {},
         ]}
       >
         {text}
@@ -45,6 +49,9 @@ const styles = StyleSheet.create({
   container_SECONDARY: {
     borderColor: "#3B71F3",
     borderWidth: 2,
+  },
+  disabled: {
+    backgroundColor: "red",
   },
   text: {
     fontWeight: "bold",

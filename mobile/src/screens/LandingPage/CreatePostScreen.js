@@ -6,7 +6,10 @@ import {
   Button,
   Image,
   StyleSheet,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
+
 import CustomInput from "../../components/CustomInput";
 import * as ImagePicker from "expo-image-picker";
 import CustomButton from "../../components/CustomButton";
@@ -14,21 +17,46 @@ import axios from "axios";
 import { useAuth } from "../../context/Auth";
 import { BACKENDPOINT } from "../../utils";
 
+const uploadMedia = async (bodyData, fileData, media) => {
+  await axios
+    .post(`${BACKENDPOINT}/Post/create/${media}`, bodyData, {
+      headers: {
+        accept: "application/json",
+        "Content-Type": `multipart/form-data;}`,
+      },
+    })
+    .then((res) => {
+      res.data.map((file) => {
+        fileData.push({
+          filename: file.filename,
+          filetype: file.contentType,
+        });
+      });
+    })
+    .catch((error) => {
+      throw error;
+    });
+};
+
 const CreatePostScreen = (props) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [media, setMedia] = useState([]);
   const [validForm, setValidForm] = useState(true);
-
+  const [isLoading, setIsLoading] = useState(false);
   const auth = useAuth();
 
+  const cleanState = () => {
+    setTitle("");
+    setDescription("");
+    setMedia([]);
+    setValidForm(true);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    const unsubscribe = props.navigation.addListener("focus", () => {
-      setTitle("");
-      setDescription("");
-      setMedia([]);
-      setValidForm(true);
-    });
+    const unsubscribe = props.navigation.addListener("focus", () => {});
+    cleanState();
     return unsubscribe;
   }, [props.navigation]);
 
@@ -54,6 +82,7 @@ const CreatePostScreen = (props) => {
       setValidForm(false);
       return;
     }
+    setIsLoading(true);
 
     let videoBodyData = new FormData();
     let imageBodyData = new FormData();
@@ -81,50 +110,42 @@ const CreatePostScreen = (props) => {
     });
 
     let fileData = [];
+
     if (hasImage) {
-      await axios
-        .post(`${BACKENDPOINT}/Post/create/image`, imageBodyData, {
-          headers: {
-            accept: "application/json",
-            "Content-Type": `multipart/form-data;}`,
-          },
-        })
-        .then((res) => {
-          res.data.map((file) => {
-            fileData.push({
-              filename: file.filename,
-              filetype: file.contentType,
-            });
-          });
-        })
-        .catch((error) => {
-          alert("Sorry, something went wrong. Image was not uploaded!");
+      try {
+        await uploadMedia(imageBodyData, fileData, "image").catch((error) => {
+          Alert.alert(
+            "Error",
+            "Sorry, something went wrong. Video was not uploaded!"
+          );
+          setIsLoading(false);
+          console.error(error);
+          throw error;
         });
+      } catch (error) {
+        return;
+      }
     }
-    console.log(fileData);
+    console.log("FileData", fileData);
 
     if (hasVideo) {
-      await axios
-        .post(`${BACKENDPOINT}/Post/create/video`, videoBodyData, {
-          headers: {
-            accept: "application/json",
-            "Content-Type": `multipart/form-data`,
-          },
-        })
-        .then((res) => {
-          res.data.map((file) => {
-            console.log(file);
-            fileData.push({
-              filename: file.filename,
-              filetype: file.contentType,
-            });
-          });
-        })
-        .catch((error) => {
-          alert("Sorry, something went wrong. Video was not uploaded!");
+      try {
+        await uploadMedia(videoBodyData, fileData, "video").catch((error) => {
+          Alert.alert(
+            "Error",
+            "Sorry, something went wrong. Video was not uploaded!"
+          );
+          setIsLoading(false);
+          console.error(error);
+          throw error;
         });
+      } catch (error) {
+        return;
+      }
     }
+    console.log("FileData2", fileData);
 
+    // Create the post data to send to the backend
     const postData = {
       title,
       user: auth.authData.username,
@@ -134,10 +155,19 @@ const CreatePostScreen = (props) => {
     };
 
     try {
-      createPost(postData);
-      alert("Post created successfully!");
+      // Call the function which sends the data to the backend to create a post
+      await createPost(postData);
+      // Post was created successfully, alert user and clean the input fields
+      Alert.alert("Success!", "Post created successfully!");
+      cleanState();
+      setIsLoading(false);
     } catch (err) {
-      alert("Sorry, something went wrong. Post was not created!");
+      Alert.alert(
+        "Error",
+        "Sorry, something went wrong. Post was not created!"
+      );
+      setIsLoading(false);
+      return;
     }
   };
 
@@ -148,7 +178,7 @@ const CreatePostScreen = (props) => {
         console.log(res.data);
       })
       .catch((error) => {
-        alert("Sorry, something went wrong. Post was not created!");
+        throw error;
       });
   };
 
@@ -181,6 +211,7 @@ const CreatePostScreen = (props) => {
         setValue={setTitle}
         autoCapitalize={false}
         onFocus={setValidForm}
+        disabled={isLoading}
       />
 
       <CustomInput
@@ -190,10 +221,12 @@ const CreatePostScreen = (props) => {
         autoCapitalize={false}
         onFocus={setValidForm}
         multiline={true}
+        disabled={isLoading}
       />
       <Button
         title="Pick images or videos from your camera roll"
         onPress={pickImage}
+        disabled={isLoading}
       />
       <View style={styles.imageContainer}>
         {media.map((file) =>
@@ -206,7 +239,21 @@ const CreatePostScreen = (props) => {
           ) : null
         )}
       </View>
-      <CustomButton text="Create Post" onPress={onCreatePost} />
+      {isLoading ? (
+        <ActivityIndicator
+          //visibility of Overlay Loading Spinner
+          visible={isLoading}
+          //Text with the Spinner
+          textContent={"Loading..."}
+          //Text style of the Spinner Text
+          textStyle={styles.spinnerTextStyle}
+        />
+      ) : null}
+      <CustomButton
+        text="Create Post"
+        disabled={isLoading}
+        onPress={onCreatePost}
+      />
     </ScrollView>
   );
 };
