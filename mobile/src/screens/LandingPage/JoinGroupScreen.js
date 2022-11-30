@@ -1,27 +1,20 @@
 import React, { useState } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Keyboard,
-} from "react-native";
+import { ScrollView, View, Text, StyleSheet, Alert } from "react-native";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import axios from "axios";
 import { BACKENDPOINT } from "../../utils";
 import { useAuth } from "../../context/Auth";
 
-const JoinGroupScreen = ({ navigation }) => {
+const JoinGroupScreen = () => {
   const [groupId, setGroupId] = useState("");
   const [noError, setNoError] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const auth = useAuth();
 
-  const onSubmitPressed = () => {
+  const onSubmitPressed = async () => {
     // Check if the group id is valid
-    axios
+    await axios
       .post(`${BACKENDPOINT}/Group/join`, {
         username: auth.authData.username,
         groupname: groupId,
@@ -30,7 +23,7 @@ const JoinGroupScreen = ({ navigation }) => {
       .then((res) => {
         auth.updateGroup(groupId, auth.authData);
         console.log(res);
-        alert(`Successfull joined ${groupId}`);
+        Alert.alert("Success!", `${groupId} has been joined!🎉`);
       })
       .catch((error) => {
         setNoError(false);

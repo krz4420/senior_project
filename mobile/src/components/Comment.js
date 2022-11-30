@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { calculateTimeDifference } from "../utils";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
+// Component for an individual comment
 const Comment = ({ author, time, body }) => {
   return (
     <View style={styles.container}>

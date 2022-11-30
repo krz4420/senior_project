@@ -5,6 +5,7 @@ import PostSection from "../screens/LandingPage/PostSection";
 
 const Stack = createNativeStackNavigator();
 
+// Stack navigator for the profile screen.
 const ProfileStack = (props) => {
   const groupName = props.route.params.groupName;
   console.log(props);

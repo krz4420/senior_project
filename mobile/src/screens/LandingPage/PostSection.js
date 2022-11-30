@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  ScrillView,
-  ScrollView,
-  Keyboard,
-} from "react-native";
+import { StyleSheet, View, ScrollView, Keyboard } from "react-native";
 import Post from "../../components/Post";
 import { useAuth } from "../../context/Auth";
 import CommentSectionView from "../../components/CommentSectionView";

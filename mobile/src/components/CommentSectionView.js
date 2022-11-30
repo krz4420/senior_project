@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { ScrollView, View, StyleSheet, Keyboard } from "react-native";
-import { useAuth } from "../context/Auth";
+import React from "react";
+import { View, StyleSheet } from "react-native";
+
 import Comment from "./Comment";
-import CommentInputBox from "./CommentInputBox";
-import axios from "axios";
-import { BACKENDPOINT } from "../utils";
 
 const CommentSectionView = (props) => {
   const { allComments, author, timestamp, description } = props;

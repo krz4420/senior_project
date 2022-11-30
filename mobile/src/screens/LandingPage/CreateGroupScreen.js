@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, View, Text, StyleSheet } from "react-native";
+import { ScrollView, View, Text, StyleSheet, Alert } from "react-native";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import axios from "axios";
@@ -12,7 +12,7 @@ const CreateGroupScreen = () => {
   const [isGroupIdNotTaken, setGroupIdNotTaken] = useState(true);
   const auth = useAuth();
 
-  const onSubmitPressed = ({ navigation }) => {
+  const onSubmitPressed = async () => {
     if (!isValidId || !isGroupIdNotTaken) {
       return;
     } else {
@@ -23,12 +23,12 @@ const CreateGroupScreen = () => {
       };
 
       // Check if the group id is already taken
-      axios
+      await axios
         .post(`${BACKENDPOINT}/Group/create`, data)
         .then((res) => {
           console.log(res);
           auth.updateGroup(groupId, auth.authData);
-          alert(`Successfull created ${groupId}`);
+          Alert.alert("Success,", `${groupId} has been created!🎉`);
         })
         .catch((error) => {
           console.error(error.response.data);

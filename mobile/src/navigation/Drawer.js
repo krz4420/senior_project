@@ -11,10 +11,10 @@ import JoinGroupScreen from "../screens/LandingPage/JoinGroupScreen";
 import CreateGroupScreen from "../screens/LandingPage/CreateGroupScreen";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useAuth } from "../context/Auth";
-import { useNavigation } from "@react-navigation/native";
 
 const Drawer = createDrawerNavigator();
 
+// Navigator for the side drawer which displays the add/join group, groups and signout
 function CustomDrawerContent(props) {
   const auth = useAuth();
 
@@ -40,7 +40,7 @@ function CustomDrawerContent(props) {
   );
 }
 
-const DrawNav = (props) => {
+const DrawNav = () => {
   const auth = useAuth();
   const group = auth.authData.groups;
 

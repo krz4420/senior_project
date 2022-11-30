@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -6,12 +6,14 @@ import {
   Keyboard,
   TextInput,
   Pressable,
+  Alert,
 } from "react-native";
 
 import axios from "axios";
 import { BACKENDPOINT } from "../utils";
 import { useAuth } from "../context/Auth";
 
+// Component for the Input Box Above the keyboard when commenting
 const CommentInputBox = ({
   id,
   body,
@@ -21,7 +23,9 @@ const CommentInputBox = ({
   allComments,
 }) => {
   const auth = useAuth();
-  const handleSubmitComment = async (comment) => {
+
+  // Post Comment to the backend
+  const handleSubmitComment = async () => {
     const data = {
       postID: id,
       username: auth.authData.username,
@@ -31,7 +35,7 @@ const CommentInputBox = ({
     // If the comment is nothing besides white space then alert the user
     const noWhiteSpace = body.replace(/\s/g, "");
     if (noWhiteSpace == "") {
-      alert("Please enter a comment!");
+      Alert.alert("Please enter a comment!");
       setBody("");
       return;
     }
@@ -39,8 +43,7 @@ const CommentInputBox = ({
     // Post comment to the backend to be uploaded
     await axios
       .post(`${BACKENDPOINT}/Post/comment`, data)
-      .then((data) => {
-        alert("Comment created successfully!");
+      .then(() => {
         // Add the new comment to the state variable for real time update to the user's feed
         setAllComments([
           ...allComments,
@@ -50,13 +53,17 @@ const CommentInputBox = ({
             body,
           },
         ]);
+
+        // Clear the comment body
         setBody("");
+        Alert.alert("Success", "Comment created successfully!");
       })
       .catch((error) => {
-        console.log(error);
-        alert("Error: Comment was not created");
+        Alert.alert("Error", "Comment was not created");
+        console.error(error);
       });
   };
+
   return (
     <View style={[styles.commentContainer, { bottom: keyboardOffset }]}>
       <TextInput
@@ -72,7 +79,7 @@ const CommentInputBox = ({
       <View>
         <Pressable
           style={styles.submitButton}
-          onPress={() => handleSubmitComment(body)}
+          onPress={() => handleSubmitComment()}
         >
           <Text style={styles.buttonText}>Post</Text>
         </Pressable>

@@ -32,20 +32,24 @@ const ProfileScreen = (props) => {
       username: auth.authData.username,
     };
 
-    axios
-      .post(`${BACKENDPOINT}/Profile`, data)
-      .then(({ data }) => {
-        console.log(`Profile screen`, data);
-        setUsersLeaderboardPosition(data.leaderboardPosition);
-        setUsersPosts(data.usersPost);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const fetchFeed = async () => {
+      await axios
+        .post(`${BACKENDPOINT}/Profile`, data)
+        .then(({ data }) => {
+          console.log(`Profile screen`, data);
+          setUsersLeaderboardPosition(data.leaderboardPosition);
+          setUsersPosts(data.usersPost);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+
+    fetchFeed();
   }, [isFocused]);
 
+  // Navigates user to a more indepth view of the post
   const handleOnPress = (post) => {
-    console.log(post.file);
     props.navigation.navigate("Post Section", {
       title: post.title,
       post: post,
@@ -53,6 +57,8 @@ const ProfileScreen = (props) => {
   };
 
   const posts = usersPosts.map((post, index) => {
+    // db model is inconsistent becuase of changes. Have to test for the existence of the file array
+    // CHANGE in the future when the db is reset.
     const uri =
       post.file &&
       post.file[0] &&

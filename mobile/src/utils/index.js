@@ -41,3 +41,35 @@ export const calculateTimeDifference = (timestamp) => {
 export const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 };
+
+export const uploadMedia = async (bodyData, fileData, media) => {
+  await axios
+    .post(`${BACKENDPOINT}/Post/create/${media}`, bodyData, {
+      headers: {
+        accept: "application/json",
+        "Content-Type": `multipart/form-data;}`,
+      },
+    })
+    .then((res) => {
+      res.data.map((file) => {
+        fileData.push({
+          filename: file.filename,
+          filetype: file.contentType,
+        });
+      });
+    })
+    .catch((error) => {
+      throw error;
+    });
+};
+
+export const createPost = async (postData) => {
+  await axios
+    .post(`${BACKENDPOINT}/Post/create/post`, postData)
+    .then((res) => {
+      console.log(res.data);
+    })
+    .catch((error) => {
+      throw error;
+    });
+};

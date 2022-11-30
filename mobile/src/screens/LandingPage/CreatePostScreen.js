@@ -13,30 +13,9 @@ import {
 import CustomInput from "../../components/CustomInput";
 import * as ImagePicker from "expo-image-picker";
 import CustomButton from "../../components/CustomButton";
-import axios from "axios";
 import { useAuth } from "../../context/Auth";
-import { BACKENDPOINT } from "../../utils";
-
-const uploadMedia = async (bodyData, fileData, media) => {
-  await axios
-    .post(`${BACKENDPOINT}/Post/create/${media}`, bodyData, {
-      headers: {
-        accept: "application/json",
-        "Content-Type": `multipart/form-data;}`,
-      },
-    })
-    .then((res) => {
-      res.data.map((file) => {
-        fileData.push({
-          filename: file.filename,
-          filetype: file.contentType,
-        });
-      });
-    })
-    .catch((error) => {
-      throw error;
-    });
-};
+import { uploadMedia, createPost } from "../../utils";
+import { useIsFocused } from "@react-navigation/native";
 
 const CreatePostScreen = (props) => {
   const [title, setTitle] = useState("");
@@ -44,8 +23,10 @@ const CreatePostScreen = (props) => {
   const [media, setMedia] = useState([]);
   const [validForm, setValidForm] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const isFocused = useIsFocused();
   const auth = useAuth();
 
+  // Wipe the state and set it to default settings
   const cleanState = () => {
     setTitle("");
     setDescription("");
@@ -54,12 +35,12 @@ const CreatePostScreen = (props) => {
     setIsLoading(false);
   };
 
+  // Every time the user navigates to Create Post Screen the state will be cleaned
   useEffect(() => {
-    const unsubscribe = props.navigation.addListener("focus", () => {});
     cleanState();
-    return unsubscribe;
-  }, [props.navigation]);
+  }, [isFocused]);
 
+  // Prompt the user to pick a picture/video from their camera roll
   const pickImage = async () => {
     setValidForm(true);
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -69,6 +50,7 @@ const CreatePostScreen = (props) => {
       quality: 1,
     });
 
+    // If they didn't cancel then add the image/video to the media state
     if (!result.cancelled) {
       setMedia([
         ...media,
@@ -77,7 +59,8 @@ const CreatePostScreen = (props) => {
     }
   };
 
-  const onCreatePost = async () => {
+  // Handles when the submit button is pressed
+  const onSubmitCreatePost = async () => {
     if (isFormEmpty()) {
       setValidForm(false);
       return;
@@ -86,6 +69,7 @@ const CreatePostScreen = (props) => {
 
     let videoBodyData = new FormData();
     let imageBodyData = new FormData();
+
     let hasVideo = false;
     let hasImage = false;
 
@@ -111,6 +95,7 @@ const CreatePostScreen = (props) => {
 
     let fileData = [];
 
+    // If the post contains an image, send data to upload image endpoint
     if (hasImage) {
       try {
         await uploadMedia(imageBodyData, fileData, "image").catch((error) => {
@@ -126,8 +111,10 @@ const CreatePostScreen = (props) => {
         return;
       }
     }
+
     console.log("FileData", fileData);
 
+    // If the post contains a video, send the data to upload video endpoint
     if (hasVideo) {
       try {
         await uploadMedia(videoBodyData, fileData, "video").catch((error) => {
@@ -143,6 +130,7 @@ const CreatePostScreen = (props) => {
         return;
       }
     }
+
     console.log("FileData2", fileData);
 
     // Create the post data to send to the backend
@@ -154,6 +142,7 @@ const CreatePostScreen = (props) => {
       description: description,
     };
 
+    // Send post data to endpoint to create a post object and store in db
     try {
       // Call the function which sends the data to the backend to create a post
       await createPost(postData);
@@ -171,17 +160,7 @@ const CreatePostScreen = (props) => {
     }
   };
 
-  const createPost = async (postData) => {
-    await axios
-      .post(`${BACKENDPOINT}/Post/create/post`, postData)
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((error) => {
-        throw error;
-      });
-  };
-
+  // Helper function to test if all inputs are
   const isFormEmpty = () => {
     const userData = [title, description];
 
@@ -236,7 +215,13 @@ const CreatePostScreen = (props) => {
               source={{ uri: file.uri }}
               style={styles.image}
             />
-          ) : null
+          ) : (
+            <Image
+              key={file.uri}
+              source={require("../../../assets/image.jpeg")}
+              style={styles.image}
+            />
+          )
         )}
       </View>
       {isLoading ? (
@@ -252,7 +237,7 @@ const CreatePostScreen = (props) => {
       <CustomButton
         text="Create Post"
         disabled={isLoading}
-        onPress={onCreatePost}
+        onPress={onSubmitCreatePost}
       />
     </ScrollView>
   );

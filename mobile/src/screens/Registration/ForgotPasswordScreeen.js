@@ -12,9 +12,9 @@ const ForgotPasswordScreen = () => {
 
   const [validFrom, setValidForm] = useState(true);
 
-  const onSendPressed = () => {
+  const onSendPressed = async () => {
     // Validate the username exists
-    axios
+    await axios
       .post(`${BACKENDPOINT}/ResetPassword/reset`, { username })
       .then((res) => {
         const email = res.data.email;
@@ -29,8 +29,7 @@ const ForgotPasswordScreen = () => {
       });
   };
 
-  const onLogIn = () => {
-    console.warn("Back to Log in");
+  const onLogInPressed = () => {
     navigation.navigate("Log In");
   };
 
@@ -51,7 +50,7 @@ const ForgotPasswordScreen = () => {
 
         <CustomButton
           text="Back to Sign In"
-          onPress={onLogIn}
+          onPress={onLogInPressed}
           type="TERTIARY"
         ></CustomButton>
       </View>

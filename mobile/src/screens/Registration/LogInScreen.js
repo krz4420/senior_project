@@ -22,7 +22,7 @@ const LogInScreen = () => {
   const [validForm, setValidForm] = useState(true);
   const auth = useAuth();
 
-  const onLogInPressed = () => {
+  const onLogInPressed = async () => {
     if (isFormEmpty()) {
       console.error("Form is empty");
       setValidForm(false);
@@ -34,7 +34,7 @@ const LogInScreen = () => {
 
     // TODO. Scrub data to protect against attacks
 
-    auth
+    await auth
       .signIn(userInfo)
       .then((res) => {
         console.log("Successful login");
@@ -48,6 +48,7 @@ const LogInScreen = () => {
         setValidForm(false);
       });
   };
+
   const isFormEmpty = () => {
     const userData = [username, password];
     if (Object.values(userData).every((val) => val.length == 0)) {
@@ -68,13 +69,7 @@ const LogInScreen = () => {
     navigation.navigate("Forgot Password");
   };
 
-  // const onGoogleSignIn = () => {
-  //     console.warn("Google Sign In attemp")
-  // }
-
   const onSignUp = () => {
-    console.warn("Sign Up");
-
     clearState();
     navigation.navigate("Sign Up");
   };
@@ -115,13 +110,6 @@ const LogInScreen = () => {
           onPress={onForgotPasswordPressed}
           type="TERTIARY"
         />
-
-        {/* <CustomButton 
-                    text= "Sign In with Google" 
-                    onPress= {onGoogleSignIn} 
-                    type="TERTIARY" 
-                    bgColor='#FAE9EA' 
-                    fgColor='#DD4D44'/> */}
 
         <CustomButton
           text="Don't have an account? Sign up!"
