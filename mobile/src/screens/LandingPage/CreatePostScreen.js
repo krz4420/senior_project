@@ -49,52 +49,96 @@ const CreatePostScreen = (props) => {
     }
   };
 
-  const onCreatePost = () => {
+  const onCreatePost = async () => {
     if (isFormEmpty()) {
       setValidForm(false);
       return;
     }
 
-    let bodyData = new FormData();
+    let videoBodyData = new FormData();
+    let imageBodyData = new FormData();
+    let hasVideo = false;
+    let hasImage = false;
 
     // Map over all the images and add them to the Form Data.
     media.map((file) => {
-      bodyData.append("file", {
-        name: file.name == null ? "image" : file.name,
-        uri: file.uri,
-        type: file.type,
-      });
+      console.log(file);
+      if (file.type.includes("image")) {
+        hasImage = true;
+        imageBodyData.append("file", {
+          name: file.name == null ? ".png" : file.name,
+          uri: file.uri,
+          type: file.type,
+        });
+      } else {
+        hasVideo = true;
+        videoBodyData.append("file", {
+          name: file.name == null ? ".mov" : file.name,
+          uri: file.uri,
+          type: file.type,
+        });
+      }
     });
 
-    axios
-      .post(`${BACKENDPOINT}/Post/create/image`, bodyData, {
-        headers: {
-          accept: "application/json",
-          "Content-Type": `multipart/form-data; boundary=${bodyData._boundary}`,
-        },
-      })
-      .then((res) => {
-        let fileData = [];
-        res.data.map((file) => {
-          fileData.push({
-            filename: file.filename,
-            filetype: file.contentType,
+    let fileData = [];
+    if (hasImage) {
+      await axios
+        .post(`${BACKENDPOINT}/Post/create/image`, imageBodyData, {
+          headers: {
+            accept: "application/json",
+            "Content-Type": `multipart/form-data;}`,
+          },
+        })
+        .then((res) => {
+          res.data.map((file) => {
+            fileData.push({
+              filename: file.filename,
+              filetype: file.contentType,
+            });
           });
+        })
+        .catch((error) => {
+          alert("Sorry, something went wrong. Image was not uploaded!");
         });
+    }
+    console.log(fileData);
 
-        const postData = {
-          title,
-          user: auth.authData.username,
-          group: props.route.params.groupName,
-          file: fileData,
-          description: description,
-        };
-        createPost(postData);
-        alert("Post created successfully!");
-      })
-      .catch((error) => {
-        alert("Sorry, something went wrong. Post was not created!");
-      });
+    if (hasVideo) {
+      await axios
+        .post(`${BACKENDPOINT}/Post/create/video`, videoBodyData, {
+          headers: {
+            accept: "application/json",
+            "Content-Type": `multipart/form-data`,
+          },
+        })
+        .then((res) => {
+          res.data.map((file) => {
+            console.log(file);
+            fileData.push({
+              filename: file.filename,
+              filetype: file.contentType,
+            });
+          });
+        })
+        .catch((error) => {
+          alert("Sorry, something went wrong. Video was not uploaded!");
+        });
+    }
+
+    const postData = {
+      title,
+      user: auth.authData.username,
+      group: props.route.params.groupName,
+      file: fileData,
+      description: description,
+    };
+
+    try {
+      createPost(postData);
+      alert("Post created successfully!");
+    } catch (err) {
+      alert("Sorry, something went wrong. Post was not created!");
+    }
   };
 
   const createPost = async (postData) => {

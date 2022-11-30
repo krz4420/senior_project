@@ -1,14 +1,18 @@
 import { Request, Response, Router } from "express";
 import { User, Group, Post } from "../models";
-const { GridFsStorage } = require("multer-gridfs-storage");
-import Grid from "gridfs-stream";
-import path from "path";
 import mongoose from "mongoose";
 
-import multer from "multer";
+const { GridFsStorage } = require("multer-gridfs-storage");
 import { GridFSBucket } from "mongodb";
+import Grid from "gridfs-stream";
+
+import path, { resolve } from "path";
+import multer from "multer";
+const hbjs = require("handbrake-js");
+var fs = require("fs");
 
 const router = Router();
+const mime = require("mime");
 
 const mongoUri =
   process.env.MONGO_URI ||
@@ -28,23 +32,30 @@ conn.once("open", () => {
   gfs.collection("posts"); // Has to be the same as the bucketName
 });
 
-const handleVideoUpload = (file: any) => {
-  console.log(file);
+const dir = path.resolve(__dirname, "../utils/tmp");
+
+const handleVideoConvert = (filePath: any, filename: any) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+  const output = dir + "/" + filename;
+
+  const options = {
+    input: filePath,
+    output: output,
+    preset: "Fast 720p30",
+  };
+
+  return hbjs.spawn(options);
 };
 
-const storage = new GridFsStorage({
+const imageStorage = new GridFsStorage({
   url: mongoUri,
   file: (req: any, file: any) => {
-    console.log("STORAGE");
-    console.log(file);
+    console.log("File", file);
     return new Promise((resolve, reject) => {
-      let ext = path.extname(file.originalname);
-
-      // if (file.mimetype && file.mimetype.includes("video")) {
-      //   console.log("UPLOADING VIDEO");
-      //   handleVideoUpload(file);
-      // }
-      const filename = `post-${Date.now()}${ext}`;
+      let ext = file.mimetype.split("/")[1];
+      const filename = `post-${Date.now()}.${ext}`;
 
       const fileInfo = {
         filename,
@@ -56,16 +67,119 @@ const storage = new GridFsStorage({
   },
 });
 
-const upload = multer({ limits: { fieldSize: 25 * 1024 * 1024 }, storage });
+// Store Video on Local Storage
+const videoStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `post-` + Date.now() + "." + file.originalname);
+  },
+});
+
+const imageUpload = multer({
+  limits: { fieldSize: 25 * 1024 * 1024 },
+  storage: imageStorage,
+});
 
 // Endpoints for storing images and posts into database
 router.post(
   "/create/image",
-  upload.array("file", 10),
+  imageUpload.array("file", 10),
   (req: Request, res: Response) => {
     console.log("REQUEST FOR CREATE IMAGE");
     console.log(req.files);
     res.status(200).json(req.files);
+  }
+);
+
+const videoUpload = multer({
+  limits: { fieldSize: 25 * 1024 * 1024 },
+  storage: videoStorage,
+});
+
+// Endpoints for storing images and posts into database
+router.post(
+  "/create/video",
+  videoUpload.array("file", 10),
+  async (req: Request, res: Response) => {
+    console.log("REQUEST FOR CREATE VIDEO");
+
+    // Grab all the videos being uploaded
+    const videoFiles: any = req.files;
+
+    // Stores the path of the mp4 and filename
+    let promises: any = [];
+
+    // Stores the filename and contentType
+    let ret: any = [];
+
+    // Go through all the videos and convert them into mp4
+    Promise.all(
+      videoFiles.map((file: any) => {
+        return new Promise((resolve, reject) => {
+          // Convert the file into mp4 format
+          const mp4FileName = file.filename.split(".")[0] + ".mp4";
+          const handbrake = handleVideoConvert(file.path, mp4FileName);
+
+          handbrake
+            // When the video conversion finishes the following block runs
+            .on("end", (data: any) => {
+              console.log("Path", handbrake.options.output);
+              // Add the filename and its new path to an array
+              promises.push({
+                filename: mp4FileName,
+                path: handbrake.options.output,
+              });
+              ret.push({ filename: mp4FileName, contentType: "video/mp4" });
+              console.log("promises", promises);
+              resolve(promises);
+            })
+            .on("error", (error: any) => {
+              console.log("error", error);
+              reject;
+            });
+        });
+      })
+    )
+      .then(() => {
+        // Take the converted files and upload to mongoDB
+        Promise.all(
+          promises.map((promise: any) => {
+            return new Promise((resolve, reject) => {
+              // Create the write stream to mongoDB
+              const writeStream = gridfsbucket.openUploadStream(
+                promise.filename
+              );
+              console.log(mime.getType(promise.path));
+              // Create the read stream taking input from video and pipe it to monogDB
+              fs.createReadStream(promise.path).pipe(writeStream);
+
+              // Reject the promise if there is an error
+              writeStream.on("error", reject);
+
+              // When the write stream is closed then resolve promise
+              writeStream.on("close", () => {
+                resolve({
+                  filename: promise.filename,
+                  contentType: "video/mp4",
+                });
+              });
+            });
+          })
+        )
+          .then((data) => {
+            // Send back the filenames and filetypes to frontend
+            res.status(200).json(data);
+          })
+          .catch((error) => {
+            console.log(error);
+            res.status(400).json(error);
+          });
+      })
+      .catch((error) => {
+        console.log("Error at bottom", error);
+      });
   }
 );
 
@@ -97,9 +211,7 @@ router.get("/retrieve/image", async (req, res) => {
 router.get("/retrieve/video", async (req, res) => {
   console.warn("IN RETRIEVE VIDEO");
   const result = await gfs.files.findOne({ filename: req.query.name });
-  console.log(result);
   if (result != null) {
-    console.log("not null");
     const readStream = gridfsbucket.openDownloadStream(result._id);
 
     readStream.pipe(res);
