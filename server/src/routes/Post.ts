@@ -1,16 +1,15 @@
 import { Request, Response, Router } from "express";
-import { User, Group, Post } from "../models";
+import { Post } from "../models";
 import mongoose from "mongoose";
-
-const { GridFsStorage } = require("multer-gridfs-storage");
 import { GridFSBucket } from "mongodb";
+import { deleteFile, convertVideo } from "../utils";
+
 import Grid from "gridfs-stream";
-
-import path, { resolve } from "path";
+import path from "path";
 import multer from "multer";
-const hbjs = require("handbrake-js");
-var fs = require("fs");
 
+const fs = require("fs");
+const { GridFsStorage } = require("multer-gridfs-storage");
 const router = Router();
 const mime = require("mime");
 
@@ -23,7 +22,7 @@ let gfs: Grid.Grid;
 let gridfsbucket: GridFSBucket;
 
 conn.once("open", () => {
-  console.log("DB open");
+  console.log("Bucket open");
   gridfsbucket = new mongoose.mongo.GridFSBucket(conn.db, {
     bucketName: "posts",
   });
@@ -32,22 +31,8 @@ conn.once("open", () => {
   gfs.collection("posts"); // Has to be the same as the bucketName
 });
 
-const dir = path.resolve(__dirname, "../utils/tmp");
-
-const handleVideoConvert = (filePath: any, filename: any) => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
-  const output = dir + "/" + filename;
-
-  const options = {
-    input: filePath,
-    output: output,
-    preset: "Very Fast 480p30",
-  };
-
-  return hbjs.spawn(options);
-};
+// Directory to store videos locally temporarily
+const TMP_DIR = path.resolve(__dirname, "../utils/tmp");
 
 // Storage Engine for when images are uploaded to backend. Uploads straight to mongoDB
 const imageStorage = new GridFsStorage({
@@ -71,16 +56,23 @@ const imageStorage = new GridFsStorage({
 // Storage Engine for videos. Downloads locally.
 const videoStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, dir);
+    cb(null, TMP_DIR);
   },
   filename: (req, file, cb) => {
     cb(null, `post-` + Date.now() + "." + file.originalname);
   },
 });
 
+// Specify how multer middleware will process images
 const imageUpload = multer({
   limits: { fieldSize: 25 * 1024 * 1024 },
   storage: imageStorage,
+});
+
+// Specify how multer middleware will process videos
+const videoUpload = multer({
+  limits: { fieldSize: 25 * 1024 * 1024 },
+  storage: videoStorage,
 });
 
 // Endpoint for storing images into the database
@@ -93,11 +85,6 @@ router.post(
     res.status(200).json(req.files);
   }
 );
-
-const videoUpload = multer({
-  limits: { fieldSize: 25 * 1024 * 1024 },
-  storage: videoStorage,
-});
 
 // Endpoint for storing videos into the databse.
 router.post(
@@ -118,20 +105,23 @@ router.post(
     // Go through all the videos and converts them into mp4
     Promise.all(
       videoFiles.map((file: any) => {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
           // Convert the file into mp4 format
           const mp4FileName = file.filename.split(".")[0] + ".mp4";
-          const handbrake = handleVideoConvert(file.path, mp4FileName);
+          const handbrake = await convertVideo(file.path, mp4FileName, TMP_DIR);
 
           handbrake
             // When the video conversion finishes the following block runs
-            .on("end", (data: any) => {
+            .on("end", async (data: any) => {
               console.log("Path", handbrake.options.output);
               // Add the filename and its new path to an array that will be passed to the then() chunk
               promises.push({
                 filename: mp4FileName,
                 path: handbrake.options.output,
               });
+
+              // Delete the .mov file
+              await deleteFile(file.path);
               ret.push({ filename: mp4FileName, contentType: "video/mp4" });
               resolve(promises);
             })
@@ -159,7 +149,9 @@ router.post(
               writeStream.on("error", reject);
 
               // When the write stream is closed this means the video has finished uploading to mongoDB, resolve promise
-              writeStream.on("close", () => {
+              writeStream.on("close", async () => {
+                await deleteFile(promise.path);
+
                 resolve({
                   filename: promise.filename,
                   contentType: "video/mp4",
@@ -184,6 +176,7 @@ router.post(
   }
 );
 
+// End point for creating a post object in mongoDB
 router.post("/create/post", async (req: Request, res: Response) => {
   const dbPost = req.body;
   console.log(req.body);
@@ -216,17 +209,13 @@ router.get("/retrieve/video", async (req, res) => {
   const result = await gfs.files.findOne({ filename: req.query.name });
 
   if (result != null) {
-    console.log("Result", result);
-    const videoPath = __dirname + "/post-1669652865650.mp4";
-
-    // const videoSize = fs.statSync(videoPath).size;
     const videoSize = result.length;
 
     console.log("VideoSize", videoSize);
 
     const { range } = req.headers;
 
-    /* Check for Range header */
+    // Check for the range header
     if (range) {
       // Grab the start and end bytes from the request
       const parts = req.headers["range"].replace(/bytes=/, "").split("-");
@@ -273,7 +262,7 @@ router.get("/retrieve/video", async (req, res) => {
 // Uses lazy loading. Frontend passes the lastPost to be rendered and limit.
 router.post("/retrieve/post", async (req, res) => {
   const { group, limit, lastPost } = req.body;
-
+  console.log("Last Post", lastPost);
   const query =
     lastPost != null
       ? {
@@ -296,6 +285,7 @@ router.post("/retrieve/post", async (req, res) => {
     });
 });
 
+// Update if a user has liked/unliked a post
 router.post("/like", async (req, res) => {
   const { postID, userID } = req.body;
   try {
@@ -313,6 +303,7 @@ router.post("/like", async (req, res) => {
   }
 });
 
+// Update a comment for the post
 router.post("/comment", async (req, res) => {
   const { postID, username, body } = req.body;
   console.log(body);

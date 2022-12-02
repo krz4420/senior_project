@@ -107,4 +107,5 @@ dist
 tmpdata
 build
 
+# Folder to convert files
 tmp
