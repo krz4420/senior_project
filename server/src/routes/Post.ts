@@ -108,7 +108,7 @@ router.post(
         return new Promise(async (resolve, reject) => {
           // Convert the file into mp4 format
           const mp4FileName = file.filename.split(".")[0] + ".mp4";
-          const handbrake = await convertVideo(file.path, mp4FileName, TMP_DIR);
+          const handbrake = convertVideo(file.path, mp4FileName, TMP_DIR);
 
           handbrake
             // When the video conversion finishes the following block runs
