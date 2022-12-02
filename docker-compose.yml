@@ -2,7 +2,7 @@ version: "3.8"
 services:
   mongodb:
     image: mongo:5.0.6
-    container_name: boneyard_mongodb
+    container_name: senior_project_mongodb
     restart: unless-stopped
     environment:
       - MONGO_INITDB_ROOT_USERNAME=user
