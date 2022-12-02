@@ -17,5 +17,3 @@
 - [ ] Frontend tested
 
 ## Todos & Follow ups
-
-<!--- Add to this for context  -->
