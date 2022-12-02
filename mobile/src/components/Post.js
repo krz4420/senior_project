@@ -81,17 +81,14 @@ const Post = ({
           {filename && filetype && filetype.includes("video") ? (
             <Video
               useNativeControls
-              style={styles.image}
-              source={
-                {
-                  // uri: `${BACKENDPOINT}/Post/retrieve/video?name=${filename}`,
-                  // uri: `http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4`,
-                  // uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-                  // uri: require("../utils/video2.mp4"),
-                }
-              }
+              style={styles.video}
+              source={{
+                uri: `${BACKENDPOINT}/Post/retrieve/video?name=${filename}`,
+              }}
               onError={(error) => console.error(error)}
-              onReadyForDisplay={(data) => console.error(data)}
+              onReadyForDisplay={(data) => console.log(data)}
+              onLoadStart={() => console.log("Video has started loading")}
+              onLoad={() => console.log("Video has finished loading")}
             />
           ) : null}
         </Pressable>
@@ -211,6 +208,12 @@ const styles = StyleSheet.create({
     margin: 8,
     height: 256,
     width: 256,
+    backgroundColor: "grey",
+  },
+  video: {
+    margin: 8,
+    height: 359,
+    width: 202,
     backgroundColor: "grey",
   },
 });

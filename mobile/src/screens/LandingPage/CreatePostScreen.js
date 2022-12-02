@@ -16,6 +16,7 @@ import CustomButton from "../../components/CustomButton";
 import { useAuth } from "../../context/Auth";
 import { uploadMedia, createPost } from "../../utils";
 import { useIsFocused } from "@react-navigation/native";
+import { Video } from "expo-av";
 
 const CreatePostScreen = (props) => {
   const [title, setTitle] = useState("");
@@ -216,10 +217,11 @@ const CreatePostScreen = (props) => {
               style={styles.image}
             />
           ) : (
-            <Image
+            <Video
+              useNativeControls
               key={file.uri}
-              source={require("../../../assets/image.jpeg")}
-              style={styles.image}
+              source={{ uri: file.uri }}
+              style={styles.video}
             />
           )
         )}
@@ -267,6 +269,12 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     borderColor: "red",
+  },
+  video: {
+    marginBottom: 10,
+    marginHorizontal: 10,
+    height: 180,
+    width: 100,
   },
 });
 

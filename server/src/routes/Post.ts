@@ -43,12 +43,13 @@ const handleVideoConvert = (filePath: any, filename: any) => {
   const options = {
     input: filePath,
     output: output,
-    preset: "Fast 720p30",
+    preset: "Very Fast 480p30",
   };
 
   return hbjs.spawn(options);
 };
 
+// Storage Engine for when images are uploaded to backend. Uploads straight to mongoDB
 const imageStorage = new GridFsStorage({
   url: mongoUri,
   file: (req: any, file: any) => {
@@ -67,7 +68,7 @@ const imageStorage = new GridFsStorage({
   },
 });
 
-// Store Video on Local Storage
+// Storage Engine for videos. Downloads locally.
 const videoStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, dir);
@@ -82,7 +83,7 @@ const imageUpload = multer({
   storage: imageStorage,
 });
 
-// Endpoints for storing images and posts into database
+// Endpoint for storing images into the database
 router.post(
   "/create/image",
   imageUpload.array("file", 10),
@@ -98,7 +99,7 @@ const videoUpload = multer({
   storage: videoStorage,
 });
 
-// Endpoints for storing images and posts into database
+// Endpoint for storing videos into the databse.
 router.post(
   "/create/video",
   videoUpload.array("file", 10),
@@ -114,7 +115,7 @@ router.post(
     // Stores the filename and contentType
     let ret: any = [];
 
-    // Go through all the videos and convert them into mp4
+    // Go through all the videos and converts them into mp4
     Promise.all(
       videoFiles.map((file: any) => {
         return new Promise((resolve, reject) => {
@@ -126,13 +127,12 @@ router.post(
             // When the video conversion finishes the following block runs
             .on("end", (data: any) => {
               console.log("Path", handbrake.options.output);
-              // Add the filename and its new path to an array
+              // Add the filename and its new path to an array that will be passed to the then() chunk
               promises.push({
                 filename: mp4FileName,
                 path: handbrake.options.output,
               });
               ret.push({ filename: mp4FileName, contentType: "video/mp4" });
-              console.log("promises", promises);
               resolve(promises);
             })
             .on("error", (error: any) => {
@@ -158,7 +158,7 @@ router.post(
               // Reject the promise if there is an error
               writeStream.on("error", reject);
 
-              // When the write stream is closed then resolve promise
+              // When the write stream is closed this means the video has finished uploading to mongoDB, resolve promise
               writeStream.on("close", () => {
                 resolve({
                   filename: promise.filename,
@@ -179,6 +179,7 @@ router.post(
       })
       .catch((error) => {
         console.log("Error at bottom", error);
+        res.status(400).json(error);
       });
   }
 );
@@ -189,17 +190,19 @@ router.post("/create/post", async (req: Request, res: Response) => {
   Post.create(dbPost)
     .then((data) => {
       console.log("Successfully Created Post");
-      res.json(data);
+      res.status(200).json(data);
     })
     .catch((err) => {
-      res.json(err);
+      res.status(400).json(err);
     });
 });
 
-// Endpoints for fetching images and posts
+// Endpoint for fetching images from monogDB
 router.get("/retrieve/image", async (req, res) => {
+  // Look up file name in mongoDB
   const result = await gfs.files.findOne({ filename: req.query.name });
 
+  // If the file exists, then open readStream and pipe it to response.
   if (result != null) {
     const readStream = gridfsbucket.openDownloadStream(result._id);
 
@@ -207,21 +210,70 @@ router.get("/retrieve/image", async (req, res) => {
   }
 });
 
-// Endpoints for fetching images and posts
+// Endpoint for fetching videos from mongoDB
 router.get("/retrieve/video", async (req, res) => {
-  console.warn("IN RETRIEVE VIDEO");
+  // Look up the file name in mongoDB
   const result = await gfs.files.findOne({ filename: req.query.name });
-  if (result != null) {
-    const readStream = gridfsbucket.openDownloadStream(result._id);
 
-    readStream.pipe(res);
+  if (result != null) {
+    console.log("Result", result);
+    const videoPath = __dirname + "/post-1669652865650.mp4";
+
+    // const videoSize = fs.statSync(videoPath).size;
+    const videoSize = result.length;
+
+    console.log("VideoSize", videoSize);
+
+    const { range } = req.headers;
+
+    /* Check for Range header */
+    if (range) {
+      // Grab the start and end bytes from the request
+      const parts = req.headers["range"].replace(/bytes=/, "").split("-");
+      const partialstart = parts[0];
+      const partialend = parts[1];
+
+      // Convert the start/end from strings to ints
+      const start = parseInt(partialstart, 10);
+      const end = partialend ? parseInt(partialend, 10) : videoSize - 1;
+      const chunksize = end - start + 1;
+
+      // Send back 206 header for partial data
+      res.writeHead(206, {
+        "Content-Range": "bytes " + start + "-" + end + "/" + videoSize,
+        "Accept-Ranges": "bytes",
+        "Content-Length": chunksize,
+        "Content-Type": "video/mp4",
+      });
+
+      // Open a read stream to the video in mongoDB
+      const readStream = gridfsbucket.openDownloadStream(result._id, {
+        start,
+        end: end + 1,
+      });
+
+      // Pipe this stream to response back to frontend
+      readStream.pipe(res);
+
+      return;
+    } else {
+      res.writeHead(200, {
+        "Content-Length": videoSize,
+        "Content-Type": "video/mp4",
+      });
+
+      const readStream = gridfsbucket.openDownloadStream(result._id);
+
+      readStream.pipe(res);
+      readStream.on("end", () => res.end());
+    }
   }
 });
 
+// Uses lazy loading. Frontend passes the lastPost to be rendered and limit.
 router.post("/retrieve/post", async (req, res) => {
   const { group, limit, lastPost } = req.body;
-  console.log("Last Post", typeof lastPost);
-  console.log("Group", group);
+
   const query =
     lastPost != null
       ? {
@@ -231,30 +283,17 @@ router.post("/retrieve/post", async (req, res) => {
           },
         }
       : { group: group };
+
   await Post.find(query)
     .sort({ createdAt: -1 })
     .limit(limit)
     .then((data) => {
-      console.log(data);
       return res.status(200).json(data);
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       return res.status(400).json(err);
     });
-
-  // Post.find({ group: group })
-  //   .then((data) => {
-  //     data.sort((x, y) => {
-  //       return y.createdAt - x.createdAt;
-  //     });
-
-  //     return res.status(200).send(data);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //     return res.status(400).json(err);
-  //   });
 });
 
 router.post("/like", async (req, res) => {
