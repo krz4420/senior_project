@@ -209,6 +209,7 @@ router.get("/retrieve/image", async (req, res) => {
 
 // Endpoints for fetching images and posts
 router.get("/retrieve/video", async (req, res) => {
+  console.log(req.headers.range);
   console.warn("IN RETRIEVE VIDEO");
   const result = await gfs.files.findOne({ filename: req.query.name });
   if (result != null) {
