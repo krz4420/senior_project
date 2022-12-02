@@ -32,7 +32,6 @@ const Post = ({
 }) => {
   const [isLiked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
-  const [width, setHeight] = useState(256);
   const auth = useAuth();
 
   useEffect(() => {
