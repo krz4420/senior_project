@@ -13,7 +13,7 @@ import {
 import { BACKENDPOINT, calculateTimeDifference } from "../utils";
 import { Video } from "expo-av";
 import { useAuth } from "../context/Auth";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import axios from "axios";
@@ -35,6 +35,8 @@ const Post = ({
   const [likeCount, setLikeCount] = useState(likes);
 
   const navigation = useNavigation();
+  const route = useRoute();
+
   const auth = useAuth();
 
   useEffect(() => {
@@ -140,7 +142,7 @@ const Post = ({
             </View>
           </View>
         </Pressable>
-        {auth.authData.username == author ? (
+        {auth.authData.username == author && route.name == "Post Section" ? (
           <Pressable
             onPress={handleDeletePost}
             style={{ alignContent: "flex-end" }}
