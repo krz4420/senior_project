@@ -16,7 +16,7 @@ import { BACKENDPOINT } from "../../utils";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Dimensions } from "react-native";
 import image from "../../../assets/image.jpeg";
-
+import * as VideoThumbnails from "expo-video-thumbnails";
 const ProfileScreen = (props) => {
   const auth = useAuth();
   const isFocused = useIsFocused();
@@ -56,6 +56,21 @@ const ProfileScreen = (props) => {
     });
   };
 
+  // const generateThumbnail = async (filename) => {
+  //   try {
+  //     const { uri } = await VideoThumbnails.getThumbnailAsync(
+  //       `${BACKENDPOINT}/Post/retrieve/video?name=${filename}`,
+  //       {
+  //         time: 0,
+  //       }
+  //     );
+  //     console.log(uri);
+  //     return uri;
+  //   } catch (e) {
+  //     console.warn(e);
+  //   }
+  // };
+
   const posts = usersPosts.map((post, index) => {
     // db model is inconsistent becuase of changes. Have to test for the existence of the file array
     // CHANGE in the future when the db is reset.
@@ -63,9 +78,10 @@ const ProfileScreen = (props) => {
       post.file &&
       post.file[0] &&
       post.file[0].filetype &&
-      post.file[0].filename &&
-      !post.file[0].filetype.includes("video")
-        ? `${BACKENDPOINT}/Post/retrieve/image?name=${post.file[0].filename}`
+      post.file[0].filename
+        ? !post.file[0].filetype.includes("video")
+          ? `${BACKENDPOINT}/Post/retrieve/image?name=${post.file[0].filename}`
+          : image
         : image;
 
     return (
