@@ -76,7 +76,10 @@ const LogInScreen = () => {
 
   const { height } = useWindowDimensions();
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={{ backgroundColor: "rgba(10, 39, 103, 0.2)" }}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.root}>
         <Image
           source={Logo}
@@ -125,7 +128,6 @@ const styles = StyleSheet.create({
   root: {
     alignItems: "center",
     padding: 20,
-    backgroundColor: "rgba(10, 39, 103, 0.2)",
   },
   logo: {
     width: "30%",

@@ -13,6 +13,7 @@ import {
 import { BACKENDPOINT, calculateTimeDifference } from "../utils";
 import { Video } from "expo-av";
 import { useAuth } from "../context/Auth";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import axios from "axios";
@@ -32,6 +33,10 @@ const Post = ({
 }) => {
   const [isLiked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
+
+  const navigation = useNavigation();
+  const route = useRoute();
+
   const auth = useAuth();
 
   useEffect(() => {
@@ -39,6 +44,25 @@ const Post = ({
     setLikeCount(likes);
   }, [likes, hasUserLikedPost]);
 
+  const confirmDelete = async () => {
+    await axios
+      .post(`${BACKENDPOINT}/Post/delete`, { postID: id })
+      .then(navigation.goBack())
+      .catch(() => {
+        Alert.alert("An Error has occured", "The post was not deleted");
+      });
+  };
+
+  const handleDeletePost = async () => {
+    Alert.alert("WARNING⚠️", "Are you sure you want to delete the post?", [
+      {
+        text: "Delete",
+        onPress: confirmDelete,
+        style: "destructive",
+      },
+      { text: "Cancel" },
+    ]);
+  };
   const handleLikePress = async (totalLikes) => {
     let totLikes = totalLikes;
     if (isLiked) {
@@ -65,54 +89,69 @@ const Post = ({
   const media = files.map(({ filename, filetype }, index) => {
     return (
       <View key={index}>
-        <Pressable onPress={handlePostNavigation}>
-          {filename &&
-          filetype &&
-          (filetype.includes("image") ||
-            filetype.includes("jpg") ||
-            filetype.includes("jpeg")) ? (
+        {filename &&
+        filetype &&
+        (filetype.includes("image") ||
+          filetype.includes("jpg") ||
+          filetype.includes("jpeg")) ? (
+          <Pressable onPress={handlePostNavigation}>
             <Image
               style={styles.image}
               source={{
                 uri: `${BACKENDPOINT}/Post/retrieve/image?name=${filename}`,
               }}
             />
-          ) : null}
-          {filename && filetype && filetype.includes("video") ? (
-            <Video
-              useNativeControls
-              style={styles.video}
-              source={{
-                uri: `${BACKENDPOINT}/Post/retrieve/video?name=${filename}`,
-              }}
-              onError={(error) => console.error(error)}
-              onReadyForDisplay={(data) => console.log(data)}
-              onLoadStart={() => console.log("Video has started loading")}
-              onLoad={() => console.log("Video has finished loading")}
-            />
-          ) : null}
-        </Pressable>
+          </Pressable>
+        ) : null}
+        {filename && filetype && filetype.includes("video") ? (
+          <Video
+            useNativeControls
+            style={styles.video}
+            source={{
+              uri: `${BACKENDPOINT}/Post/retrieve/video?name=${filename}`,
+            }}
+            onError={(error) => console.error(error)}
+            isMuted={false}
+          />
+        ) : null}
       </View>
     );
   });
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={handlePostNavigation}>
-        <View style={styles.userInfo}>
-          <MaterialCommunityIcons
-            style={styles.avatar}
-            name={"account"}
-            size={50}
-          />
-          <View style={styles.textInfo}>
-            <Text style={{ fontSize: 14, fontWeight: "bold" }}>{author}</Text>
-            <Text style={{ fontSize: 12, color: "#666" }}>
-              {calculateTimeDifference(timestamp)}
-            </Text>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Pressable onPress={handlePostNavigation}>
+          <View style={styles.userInfo}>
+            <MaterialCommunityIcons
+              style={styles.avatar}
+              name={"account"}
+              size={50}
+            />
+            <View style={styles.textInfo}>
+              <Text style={{ fontSize: 14, fontWeight: "bold" }}>{author}</Text>
+              <Text style={{ fontSize: 12, color: "#666" }}>
+                {calculateTimeDifference(timestamp)}
+              </Text>
+            </View>
           </View>
-        </View>
-      </Pressable>
+        </Pressable>
+        {auth.authData.username == author && route.name == "Post Section" ? (
+          <Pressable
+            onPress={handleDeletePost}
+            style={{ alignContent: "flex-end" }}
+          >
+            <MaterialCommunityIcons color="#E053" name={"delete"} size={20} />
+          </Pressable>
+        ) : null}
+      </View>
+
       <ScrollView
         horizontal={true}
         contentContainerStyle={styles.imageContainer}
