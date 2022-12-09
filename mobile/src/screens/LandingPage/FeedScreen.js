@@ -1,4 +1,3 @@
-import { useIsFocused } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState, useCallback } from "react";
 import {
@@ -17,7 +16,6 @@ const POST_LIMIT = 10;
 
 const FeedScreen = (props) => {
   const auth = useAuth();
-  const isFocused = useIsFocused();
 
   const [postsData, setPostsData] = useState([]);
   const [lastPost, setLastPost] = useState(null);
@@ -70,10 +68,12 @@ const FeedScreen = (props) => {
   };
 
   useEffect(() => {
-    if (isFocused) {
+    const unsubscribe = props.navigation.addListener("focus", () => {
       fetchFeed();
-    }
-  }, [isFocused]);
+    });
+
+    return unsubscribe;
+  }, [props.navigation]);
 
   // Create the posts array
   const posts = postsData.map((post) => {
