@@ -320,4 +320,16 @@ router.post("/comment", async (req, res) => {
   }
 });
 
+router.post("/delete", async (req, res) => {
+  const { postID } = req.body;
+  console.log(postID);
+  try {
+    await Post.findByIdAndDelete(postID);
+
+    res.status(200).json("Post has been deleted!");
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
+
 export default router;
