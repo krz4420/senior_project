@@ -70,10 +70,13 @@ const FeedScreen = (props) => {
   };
 
   useEffect(() => {
-    if (isFocused) {
+    const unsubscribe = props.navigation.addListener("focus", () => {
       fetchFeed();
-    }
-  }, [isFocused]);
+      //Put your Data loading function here instead of my loadData()
+    });
+
+    return unsubscribe;
+  }, [props.navigation]);
 
   // Create the posts array
   const posts = postsData.map((post) => {
