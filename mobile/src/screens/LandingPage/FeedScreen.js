@@ -67,6 +67,7 @@ const FeedScreen = (props) => {
     setIsLoading(false);
   };
 
+  // Fetches posts when the user navigates to the Feed Screen
   useEffect(() => {
     const unsubscribe = props.navigation.addListener("focus", () => {
       fetchFeed();
